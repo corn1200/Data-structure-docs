@@ -60,7 +60,7 @@
 
 ### C# 예제
 1차원 배열
-```c
+```c#
 int[] i = new int[5] { 1, 2, 3, 4, 5 };
 i[2] = 5;
 Console.WriteLine(i[2]);
@@ -75,7 +75,7 @@ hello
 ```
 
 2차원 배열
-```c
+```c#
 int[,] i = new int[3, 5];
 i[1, 2] = 20;
 Console.WriteLine(i[1, 2])
@@ -85,7 +85,7 @@ Console.WriteLine(i[1, 2])
 ```
 
 3차원 배열
-```c
+```c#
 int[,,] i = new int[3, 5, 7];
 i[0, 4, 2] = 30;
 Console.WriteLine(i[0, 4, 2]);
@@ -98,7 +98,7 @@ Console.WriteLine(i[0, 4, 2]);
 추상적 자료형인 리스트를 구현한 자료구조로, 어떤 데이터 덩어리(이하 노드Node)를 저장할 때 그 다음 순서의 자료가 있는 위치를 데이터에 포함시키는 방식으로 자료를 저장한다.   
 
 ### 설명
-![연결 리스트 설명](/img/fHN1NVQHHW16QbYY4jch6ocGYxgnipOeV0lb2ybktx_tt4WVfUbGDctXFpIm3o7mIqhWFGtea4WTsdenG3lmOqpHFm6rqwtWDVwzXxZ9u2G4yqD05PutZ5C0EiwEVsMwRg-IGrSylGESXWTEIpqaBg.webp)
+![연결 리스트 설명](/img/linked_list.webp)
 
 배열이 A 1번, B 2번, C 3번, D 4번...식으로 자료의 순번을 맞춘다면, 연결 리스트는 A 다음 B, B 다음, C, C 다음 D...식으로 자료를 연결해놓는다.  
 따라서 배열과는 달리 새로운 자료, 즉 노드를 뒤에 연결하거나 중간에 노드 몇개를 껴놓는 것이 쉽다.  
@@ -116,3 +116,61 @@ B+tree 자료구조는 연결 리스트에 힙을 더한 것 같은 모양새를
 
 ### 구현 방법
 일반적으로 구조체와 그 포인터로 구성된다.
+
+### 2.2.1. 단순 연결 리스트
+![단순 연결 리스트](/img/singly_linked_list.webp)
+
+다음 노드에 대한 참조만을 가진 가장 단순한 형태의 연결 리스트이다.  
+가장 마지막 원소를 찾으려면 얄짤없이 리스트 끝까지 찾아가야 하기 때문에(O(n)), 마지막 원소를 가리키는 참조를 따로 가지는 형태의 변형도 있다.  
+보통 큐를 구현할 때 이런 방법을 쓴다.
+
+이 자료구조는 Head노드를 참조하는 주소를 잃어버릴 경우 데이터 전체를 못 쓰게 되는 단점이 있다.  
+다음 노드를 참조하는 주소 중 하나가 잘못되는 경우에도 체인이 끊어진 거 처럼 거기부터 뒤쪽 자료들을 유실한다.  
+따라서 안정적인 자료구조는 아니다.
+
+파일 시스템 중 FAT 파일 시스템이 이 단순 연결 리스트로 파일 청크를 연결하는데 그래서 FAT 파일 시스템은 파일 내용 일부가 손상될 경우 파일의 상당 부분을 유실할 수 있고 랜던 액세스 성능도 낮다.
+
+### 예제
+```c#
+public class Node<T>
+{
+    public T Value { get; set; }
+    public Node<T> NextNode { get; set; }
+
+    public Node(T value)
+    {
+        this.Value = value;
+    }
+}
+
+public class SinglyLinkedList<T>
+{
+    public Node<T> Head;
+    public Node<T> Tail;
+    public int Count;
+
+    public void Add(T Value)
+    {
+        Node<T> newNode = new Node<T>(Value);
+        if (Head == null)
+        {
+            Head = newNode;
+            Tail = Head;
+            Count = 1;
+        }
+        else
+        {
+            if(Count == 1)
+            {
+                Tail = newNode;
+                Head.NextNode = Tail;
+            } else
+            {
+                Tail.NextNode = newNode;
+                Tail = newNode;
+            }
+            Count++;
+        }
+    }
+}
+```
