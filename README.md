@@ -131,7 +131,270 @@ B+tree 자료구조는 연결 리스트에 힙을 더한 것 같은 모양새를
 
 파일 시스템 중 FAT 파일 시스템이 이 단순 연결 리스트로 파일 청크를 연결하는데 그래서 FAT 파일 시스템은 파일 내용 일부가 손상될 경우 파일의 상당 부분을 유실할 수 있고 랜던 액세스 성능도 낮다.
 
-### 예제
+### 구현
+```c#
+public class Node<T>
+{
+    public T Data { get; set; }
+    public Node<T> NextNode { get; set; }
+
+    public Node(T data)
+    {
+        this.Data = data;
+    }
+}
+```
+노드 클래스는 제네릭 타입의 데이터와 다음 노드를 참조하는 변수를 필드로 가진다.   
+생성자를 통해 노드 객체 생성 시 매개변수로 받은 data를 Data로 가지고, 다음 노드를 참조하는 변수는 null인 상태가 된다.
+
+```c#
+public class SinglyLinkedList<T>
+{
+    public Node<T> Head;
+    public Node<T> Tail;
+    public int Length = 0;
+    ...
+}
+```
+연결 리스트 클래스는 머리 노드와 꼬리 노드, 연결 리스트의 길이를 저장하는 변수를 필드로 가진다.     
+머리 노드는 연결 리스트의 시작 노드를, 꼬리 노드는 연결 리스트의 마지막 노드를 참조한다.    
+길이 변수는 index 값 유효 검증, 노드가 한 개일 경우(Head = Tail)의 예외 처리, 노드의 길이 출력 등에 쓰인다.
+
+```c#
+...
+private bool IsInvalidIndex(int index)
+{
+    if (0 > index || getLength() - 1 < index)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+...
+```
+연결 리스트 클래스 내부에서만 사용할 인덱스 유효 확인 함수를 작성한다.  
+매개변수 index의 값이 0보다 미만이거나, 현재 연결 리스트 길이(0부터 번호 매김)를 초과하는지 확인 후 index 값이 유효하지 않을 경우 false를 반환한다.
+
+```c#
+...
+public bool IsEmpty()
+{
+    if (Head == null || Tail == null || Length == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+...
+```
+연결 리스트의 비어 있는지 확인하는 함수를 작성한다.     
+머리 노드, 꼬리 노드가 아무 노드도 참조하고 있지 않거나 연결 리스트의 길이가 0이면 노드가 존재하지 않는 것으로 취급하여 true를 반환하고 그렇지 않을 경우 노드가 한 개 이상 존재하는 것으로 취급하고 false를 반환한다.     
+노드 추가, 노드 삭제, 노드 검색 등 함수에서 비어 있는 연결 리스트 예외처리에 사용된다.
+
+```c#
+...
+public void Add(T data)
+{
+    Node<T> newNode = new Node<T>(data);
+
+    if (IsEmpty())
+    {
+        Head = newNode;
+        Tail = newNode;
+        Length = 1;
+    }
+    else
+    {
+        if (Length == 1)
+        {
+            Tail = newNode;
+            Head.NextNode = Tail;
+        }
+        else
+        {
+            Tail.NextNode = newNode;
+            Tail = newNode;
+        }
+        Length++;
+    }
+}
+...
+```
+연결 리스트의 가장 마지막에 새 노드를 추가하는 함수를 작성한다.     
+매개변수 data로 새로운 노드 객체를 생성하고 현재 리스트가 비어 있으면 새로운 노드는 머리이자 꼬리 노드가 된다(Head, Tail 둘 다 새 노드 객체를 참조).  
+현재 노드가 한 개일 경우(Head = Tail) 새로 삽입한 노드가 꼬리 노드가 되고, 머리 노드의 다음 노드는 꼬리 노드가 된다.    
+일반적인 경우엔 현재 꼬리 노드는 다음 노드로 새 노드를 참조하고, 리스트의 꼬리 노드를 가리키는 Tail은 새 노드를 참조하게 된다.
+
+```c#
+...
+public bool AddBefore(int index, T data)
+{
+    if (!IsInvalidIndex(index))
+    {
+        return false;
+    }
+    else
+    {
+        Node<T> newNode = new Node<T>(data);
+        Node<T> beforeNode = null;
+        Node<T> targetNode = Head;
+
+        for (int i = 0; i < index; i++)
+        {
+            beforeNode = targetNode;
+            targetNode = targetNode.NextNode;
+        }
+
+        if (targetNode == Head)
+        {
+            newNode.NextNode = Head;
+            Head = newNode;
+        }
+        else
+        {
+            beforeNode.NextNode = newNode;
+            newNode.NextNode = targetNode;
+        }
+        Length++;
+        return true;
+    }
+}
+...
+```
+원하는 노드 위치의 이전에 새 노드를 추가하는 함수를 작성한다.   
+매개변수 index가 유효한지 검사 후 유효한 하지 않은 경우 동작을 실행할 수 없다는 의미의 false를 반환한다.    
+유효한 경우 매개변수 data로 새 노드 객체를 생성하고 타겟 노드와 이전 노드를 검색한다.   
+만약 타겟 노드가 머리 노드라면 새 노드를 머리 노드로 교체하는 작업이 필요하기 때문에 새 노드의 다음 노드가 현재 머리 노드를 참조하도록 하고, 연결 리스트의 머리 노드는 새 노드를 참조하도록 한다.     
+일반적인 경우엔 이전 노드가 다음 노드로 새 노드를 참조하도록 하고, 새 노드가 다음 노드로 타겟 노드를 참조하도록 한다.
+
+```c#
+...
+public bool AddAfter(int index, T data)
+{
+    if (!IsInvalidIndex(index))
+    {
+        return false;
+    }
+    else
+    {
+        Node<T> newNode = new Node<T>(data);
+        Node<T> targetNode = Head;
+
+        for (int i = 0; i < index; i++)
+        {
+            targetNode = targetNode.NextNode;
+        }
+
+        if (targetNode == Tail)
+        {
+            Tail.NextNode = newNode;
+            Tail = newNode;
+        }
+        else
+        {
+            newNode.NextNode = targetNode.NextNode;
+            targetNode.NextNode = newNode;
+        }
+        Length++;
+        return true;
+    }
+}
+...
+```
+원하는 노드 위치의 다음에 새 노드를 추가하는 함수를 작성한다.   
+매개변수 index가 유효한지 검사 후 유효한 하지 않은 경우 동작을 실행할 수 없다는 의미의 false를 반환한다.    
+유효한 경우 매개변수 data로 새 노드 객체를 생성하고 타겟 노드를 검색한다.   
+만약 타겟 노드가 꼬리 노드라면 새 노드를 꼬리 노드로 교체하는 작업이 필요하기 때문에 꼬리 노드의 다음 노드가 새 노드를 참조하도록 하고, 연결 리스트의 꼬리 노드는 새 노드를 참조하도록 한다.     
+일반적인 경우엔 새 노드가 다음 노드로 타겟 노드의 다음 노드를 참조하도록 하고, 타겟 노드가 다음 노드로 새 노드를 참조하도록 한다.
+
+```c#
+...
+public bool Remove(int index)
+{
+    if (IsEmpty() || !IsInvalidIndex(index))
+    {
+        return false;
+    }
+    else
+    {
+        Node<T> beforeNode = null;
+        Node<T> targetNode = Head;
+
+        for (int i = 0; i < index; i++)
+        {
+            beforeNode = targetNode;
+            targetNode = targetNode.NextNode;
+        }
+
+        if (Length == 1)
+        {
+            Head = null;
+            Tail = null;
+        }
+        else if (targetNode == Head)
+        {
+            Head = Head.NextNode;
+            targetNode = null;
+        }
+        else
+        {
+            beforeNode.NextNode = targetNode.NextNode;
+            targetNode = null;
+        }
+        Length--;
+        return true;
+    }
+}
+...
+```
+원하는 위치의 노드를 삭제하는 함수를 작성한다.  
+노드가 비어 있는지, 유효한 index인지 확인 후 Remove 작업을 실행할 수 없을 경우 false를 반환한다.    
+타겟 노드와 이전 노드를 검색하고 노드가 한 개 뿐일 경우 머리 노드와 꼬리 노드의 참조를 없앰으로써 연결 리스트를 비운다.     
+타겟 노드가 머리 노드일 경우 연결 리스트의 머리 노드 변수는 현재 머리 노드의 다음 노드를 참조하도록 변경하고, 타겟 노드의 참조를 해제함으로써 가비지컬렉터가 메모리 할당을 해제할 기회를 제공한다.  
+일반적인 경우엔 이전 노드의 다음 노드 변수가 타겟 노드의 다음 노드를 참조하도록 하고, 마찬가지로 타겟 노드의 참조를 해제한다.
+
+```c#
+...
+public Node<T> Peek()
+{
+    return Head;
+}
+
+public int GetLength()
+{
+    return Length;
+}
+
+public Node<T> GetNode(int index)
+{
+    if (IsEmpty() || !IsInvalidIndex(index))
+    {
+        return null;
+    }
+    else
+    {
+        Node<T> targetNode = Head;
+
+        for (int i = 0; i < index; i++)
+        {
+            targetNode = targetNode.NextNode;
+        }
+
+        return targetNode;
+    }
+}
+...
+```
+연결 리스트의 첫 번째 노드를 반환하는 함수와 연결 리스트의 길이를 반환하는 함수, 특정 노드를 검색하고 반환하는 함수를 작성한다.     
+노드 검색 전 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인한다.  
+머리 노드부터 시작해서 현재 노드의 다음 노드 참조로 변수 값을 업데이트 하면서 검색 후 반환한다.
+
 [파일](/sample_code/SinglyLinkedList.cs)
 <details>
 <summary>C# 예제 코드</summary>
@@ -143,13 +406,13 @@ using System;
 public class Node<T>
 {
     // 노드의 값과 다음 노드 객체
-    public T Value { get; set; }
+    public T Data { get; set; }
     public Node<T> NextNode { get; set; }
 
     // 생성자
-    public Node(T value)
+    public Node(T data)
     {
-        this.Value = value;
+        this.Data = data;
     }
 }
 
@@ -160,6 +423,21 @@ public class SinglyLinkedList<T>
     public Node<T> Head;
     public Node<T> Tail;
     public int Length = 0;
+
+    // 인덱스 값이 유효한지 확인
+    private bool IsInvalidIndex(int index)
+    {
+        // 인덱스가 0 미만이거나,
+        // 연결 리스트 길이를 초과할 경우 false 반환
+        if (0 > index || getLength() - 1 < index)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 
     // 연결 리스트가 비어 있는지 확인
     public bool IsEmpty()
@@ -178,17 +456,17 @@ public class SinglyLinkedList<T>
     }
 
     // 꼬리 노드 다음에 새로운 노드 추가
-    public void Add(T value)
+    public void Add(T data)
     {
         // 새로운 노드 생성
-        Node<T> newNode = new Node<T>(value);
+        Node<T> newNode = new Node<T>(data);
 
         // 연결 리스트가 비어 있는지 확인
         if (IsEmpty())
         {
             // 새로운 노드는 머리 노드이자 꼬리 노드가 된다
             Head = newNode;
-            Tail = Head;
+            Tail = newNode;
             Length = 1;
         }
         else
@@ -213,7 +491,7 @@ public class SinglyLinkedList<T>
     }
 
     // 지정한 노드 다음에 새로운 노드 추가
-    public bool AddBefore(int index, T value)
+    public bool AddBefore(int index, T data)
     {
         // 인덱스 값이 유효한지 확인
         if (!IsInvalidIndex(index))
@@ -224,7 +502,7 @@ public class SinglyLinkedList<T>
         {
             // 새로운 노드 생성
             // 이전 노드, 지정한 노드
-            Node<T> newNode = new Node<T>(value);
+            Node<T> newNode = new Node<T>(data);
             Node<T> beforeNode = null;
             Node<T> targetNode = Head;
 
@@ -256,7 +534,7 @@ public class SinglyLinkedList<T>
     }
 
     // 지정한 노드 이전에 새로운 노드 추가
-    public bool AddAfter(int index, T value)
+    public bool AddAfter(int index, T data)
     {
         // 인덱스 값이 유효한지 확인
         if (!IsInvalidIndex(index))
@@ -267,7 +545,7 @@ public class SinglyLinkedList<T>
         {
             // 새로운 노드 생성
             // 지정한 노드
-            Node<T> newNode = new Node<T>(value);
+            Node<T> newNode = new Node<T>(data);
             Node<T> targetNode = Head;
 
             // 노드 검색
@@ -351,13 +629,13 @@ public class SinglyLinkedList<T>
     }
 
     // 연결 리스트의 길이를 반환
-    public int getLength()
+    public int GetLength()
     {
         return Length;
     }
 
     // 지정한 노드를 반환
-    public Node<T> getNode(int index)
+    public Node<T> GetNode(int index)
     {
         // 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인
         if (IsEmpty() || !IsInvalidIndex(index))
@@ -377,21 +655,6 @@ public class SinglyLinkedList<T>
 
             // 지정한 노드 반환
             return targetNode;
-        }
-    }
-
-    // 인덱스 값이 유효한지 확인
-    private bool IsInvalidIndex(int index)
-    {
-        // 인덱스가 0 미만이거나,
-        // 연결 리스트 길이를 초과할 경우 false 반환
-        if (0 > index || getLength() - 1 < index)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
         }
     }
 }

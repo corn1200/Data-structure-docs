@@ -22,6 +22,21 @@ public class SinglyLinkedList<T>
     public Node<T> Tail;
     public int Length = 0;
 
+    // 인덱스 값이 유효한지 확인
+    private bool IsInvalidIndex(int index)
+    {
+        // 인덱스가 0 미만이거나,
+        // 연결 리스트 길이를 초과할 경우 false 반환
+        if (0 > index || getLength() - 1 < index)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     // 연결 리스트가 비어 있는지 확인
     public bool IsEmpty()
     {
@@ -49,7 +64,7 @@ public class SinglyLinkedList<T>
         {
             // 새로운 노드는 머리 노드이자 꼬리 노드가 된다
             Head = newNode;
-            Tail = Head;
+            Tail = newNode;
             Length = 1;
         }
         else
@@ -238,21 +253,6 @@ public class SinglyLinkedList<T>
 
             // 지정한 노드 반환
             return targetNode;
-        }
-    }
-
-    // 인덱스 값이 유효한지 확인
-    private bool IsInvalidIndex(int index)
-    {
-        // 인덱스가 0 미만이거나,
-        // 연결 리스트 길이를 초과할 경우 false 반환
-        if (0 > index || getLength() - 1 < index)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
         }
     }
 }
