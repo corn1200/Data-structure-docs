@@ -673,3 +673,21 @@ Head와 Tail노드를 갖고 있다면 둘 중 하나를 가지고 전체 리스
 단일 연결 리스트는 Tail노드로는 리스트 순회가 불가능하고 Head노드 유실시 전체 자료를 다 잃어버린다.     
 단점은 이런 보정 알고리즘을 구현하지 않았을 경우에는 오히려 손상에 더 취약해진다는 것이다.
 예를 들어 next포인터는 갱신을 했는데 prev포인터는 갱신하지 않았을 경우 prev포인터를 따라가는 순회에서 도달 불가능한 '잃어버린' 노드가 발생한다.
+
+### 구현
+
+[파일](/sample_code/DoublyLinkedList.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
+using System;
+
+public class DoubleLinkedList
+{
+	public DoubleLinkedList()
+	{
+	}
+}
+```
+</details>
