@@ -208,6 +208,14 @@ public class SinglyLinkedList<T>
                 Head = Head.NextNode;
                 targetNode = null;
             }
+            else if (targetNode == Tail)
+            {
+                // 꼬리 노드의 이전 노드는 꼬리 노드가 되고,
+                // 꼬리 노드의 다음 노드와 지정 노드의 참조를 해제한다
+                Tail = beforeNode;
+                Tail.NextNode = null;
+                targetNode = null;
+            }
             else
             {
                 // 지정한 노드의 다음 노드는 이전 노드의 다음 노드가 되고,

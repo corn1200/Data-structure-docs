@@ -342,6 +342,12 @@ public bool Remove(int index)
             Head = Head.NextNode;
             targetNode = null;
         }
+        else if (targetNode == Tail)
+        {
+            Tail = beforeNode;
+            Tail.NextNode = null;
+            targetNode = null;
+        }
         else
         {
             beforeNode.NextNode = targetNode.NextNode;
@@ -356,7 +362,8 @@ public bool Remove(int index)
 원하는 위치의 노드를 삭제하는 함수를 작성한다.  
 노드가 비어 있는지, 유효한 index인지 확인 후 Remove 작업을 실행할 수 없을 경우 false를 반환한다.    
 타겟 노드와 이전 노드를 검색하고 노드가 한 개 뿐일 경우 머리 노드와 꼬리 노드의 참조를 없앰으로써 연결 리스트를 비운다.     
-타겟 노드가 머리 노드일 경우 연결 리스트의 머리 노드 변수는 현재 머리 노드의 다음 노드를 참조하도록 변경하고, 타겟 노드의 참조를 해제함으로써 가비지컬렉터가 메모리 할당을 해제할 기회를 제공한다.  
+타겟 노드가 머리 노드일 경우 연결 리스트의 머리 노드 변수는 현재 머리 노드의 다음 노드를 참조하도록 변경하고, 타겟 노드의 참조를 해제함으로써 가비지컬렉터가 메모리 할당을 해제할 기회를 제공한다.
+타겟 노드가 꼬리 노드일 경우 연결 리스트의 꼬리 노드 변수는 현재 꼬리 노드의 이전 노드를 참조하도록 변경하고, 타겟 노드와 꼬리 노드의 다음 노드 참조를 해제함으로써 가비지컬렉터가 메모리 할당을 해제할 기회를 제공한다.  
 일반적인 경우엔 이전 노드의 다음 노드 변수가 타겟 노드의 다음 노드를 참조하도록 하고, 마찬가지로 타겟 노드의 참조를 해제한다.
 
 ```c#
@@ -608,6 +615,14 @@ public class SinglyLinkedList<T>
                 // 머리 노드의 다음 노드는 머리 노드가 되고,
                 // 지정한 노드의 참조를 해제한다
                 Head = Head.NextNode;
+                targetNode = null;
+            }
+            else if (targetNode == Tail)
+            {
+                // 꼬리 노드의 이전 노드는 꼬리 노드가 되고,
+                // 꼬리 노드의 다음 노드와 지정 노드의 참조를 해제한다
+                Tail = beforeNode;
+                Tail.NextNode = null;
                 targetNode = null;
             }
             else
