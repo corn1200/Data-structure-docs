@@ -135,13 +135,13 @@ B+tree 자료구조는 연결 리스트에 힙을 더한 것 같은 모양새를
 ```c#
 public class Node<T>
 {
-    public T Data { get; set; }
-    public Node<T> NextNode { get; set; }
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
 
-    public Node(T data)
-    {
-        this.Data = data;
-    }
+  public Node(T data)
+  {
+    this.Data = data;
+  }
 }
 ```
 노드 클래스는 제네릭 타입의 데이터와 다음 노드를 참조하는 변수를 필드로 가진다.   
@@ -150,10 +150,10 @@ public class Node<T>
 ```c#
 public class SinglyLinkedList<T>
 {
-    public Node<T> Head;
-    public Node<T> Tail;
-    public int Length = 0;
-    ...
+  public Node<T> Head;
+  public Node<T> Tail;
+  public int Length = 0;
+  ...
 }
 ```
 연결 리스트 클래스는 머리 노드와 꼬리 노드, 연결 리스트의 길이를 저장하는 변수를 필드로 가진다.     
@@ -164,14 +164,14 @@ public class SinglyLinkedList<T>
 ...
 private bool IsInvalidIndex(int index)
 {
-    if (0 > index || getLength() - 1 < index)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+  if (0 > index || getLength() - 1 < index)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 }
 ...
 ```
@@ -182,14 +182,14 @@ private bool IsInvalidIndex(int index)
 ...
 public bool IsEmpty()
 {
-    if (Head == null || Tail == null || Length == 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+  if (Head == null || Tail == null || Length == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 ...
 ```
@@ -201,28 +201,28 @@ public bool IsEmpty()
 ...
 public void Add(T data)
 {
-    Node<T> newNode = new Node<T>(data);
+  Node<T> newNode = new Node<T>(data);
 
-    if (IsEmpty())
+  if (IsEmpty())
+  {
+    Head = newNode;
+    Tail = newNode;
+    Length = 1;
+  }
+  else
+  {
+    if (Length == 1)
     {
-        Head = newNode;
-        Tail = newNode;
-        Length = 1;
+      Tail = newNode;
+      Head.NextNode = Tail;
     }
     else
     {
-        if (Length == 1)
-        {
-            Tail = newNode;
-            Head.NextNode = Tail;
-        }
-        else
-        {
-            Tail.NextNode = newNode;
-            Tail = newNode;
-        }
-        Length++;
+      Tail.NextNode = newNode;
+      Tail = newNode;
     }
+    Length++;
+  }
 }
 ...
 ```
@@ -235,35 +235,35 @@ public void Add(T data)
 ...
 public bool AddBefore(int index, T data)
 {
-    if (!IsInvalidIndex(index))
+  if (!IsInvalidIndex(index))
+  {
+    return false;
+  }
+  else
+  {
+    Node<T> newNode = new Node<T>(data);
+    Node<T> beforeNode = null;
+    Node<T> targetNode = Head;
+
+    for (int i = 0; i < index; i++)
     {
-        return false;
+      beforeNode = targetNode;
+      targetNode = targetNode.NextNode;
+    }
+
+    if (targetNode == Head)
+    {
+      newNode.NextNode = Head;
+      Head = newNode;
     }
     else
     {
-        Node<T> newNode = new Node<T>(data);
-        Node<T> beforeNode = null;
-        Node<T> targetNode = Head;
-
-        for (int i = 0; i < index; i++)
-        {
-            beforeNode = targetNode;
-            targetNode = targetNode.NextNode;
-        }
-
-        if (targetNode == Head)
-        {
-            newNode.NextNode = Head;
-            Head = newNode;
-        }
-        else
-        {
-            beforeNode.NextNode = newNode;
-            newNode.NextNode = targetNode;
-        }
-        Length++;
-        return true;
+      beforeNode.NextNode = newNode;
+      newNode.NextNode = targetNode;
     }
+    Length++;
+    return true;
+  }
 }
 ...
 ```
@@ -277,33 +277,33 @@ public bool AddBefore(int index, T data)
 ...
 public bool AddAfter(int index, T data)
 {
-    if (!IsInvalidIndex(index))
+  if (!IsInvalidIndex(index))
+  {
+    return false;
+  }
+  else
+  {
+    Node<T> newNode = new Node<T>(data);
+    Node<T> targetNode = Head;
+
+    for (int i = 0; i < index; i++)
     {
-        return false;
+      targetNode = targetNode.NextNode;
+    }
+
+    if (targetNode == Tail)
+    {
+      Tail.NextNode = newNode;
+      Tail = newNode;
     }
     else
     {
-        Node<T> newNode = new Node<T>(data);
-        Node<T> targetNode = Head;
-
-        for (int i = 0; i < index; i++)
-        {
-            targetNode = targetNode.NextNode;
-        }
-
-        if (targetNode == Tail)
-        {
-            Tail.NextNode = newNode;
-            Tail = newNode;
-        }
-        else
-        {
-            newNode.NextNode = targetNode.NextNode;
-            targetNode.NextNode = newNode;
-        }
-        Length++;
-        return true;
+      newNode.NextNode = targetNode.NextNode;
+      targetNode.NextNode = newNode;
     }
+    Length++;
+    return true;
+  }
 }
 ...
 ```
@@ -317,45 +317,45 @@ public bool AddAfter(int index, T data)
 ...
 public bool Remove(int index)
 {
-    if (IsEmpty() || !IsInvalidIndex(index))
+  if (IsEmpty() || !IsInvalidIndex(index))
+  {
+    return false;
+  }
+  else
+  {
+    Node<T> beforeNode = null;
+    Node<T> targetNode = Head;
+
+    for (int i = 0; i < index; i++)
     {
-        return false;
+      beforeNode = targetNode;
+      targetNode = targetNode.NextNode;
+    }
+
+    if (Length == 1)
+    {
+      Head = null;
+      Tail = null;
+    }
+    else if (targetNode == Head)
+    {
+      Head = Head.NextNode;
+      targetNode = null;
+    }
+    else if (targetNode == Tail)
+    {
+      Tail = beforeNode;
+      Tail.NextNode = null;
+      targetNode = null;
     }
     else
     {
-        Node<T> beforeNode = null;
-        Node<T> targetNode = Head;
-
-        for (int i = 0; i < index; i++)
-        {
-            beforeNode = targetNode;
-            targetNode = targetNode.NextNode;
-        }
-
-        if (Length == 1)
-        {
-            Head = null;
-            Tail = null;
-        }
-        else if (targetNode == Head)
-        {
-            Head = Head.NextNode;
-            targetNode = null;
-        }
-        else if (targetNode == Tail)
-        {
-            Tail = beforeNode;
-            Tail.NextNode = null;
-            targetNode = null;
-        }
-        else
-        {
-            beforeNode.NextNode = targetNode.NextNode;
-            targetNode = null;
-        }
-        Length--;
-        return true;
+      beforeNode.NextNode = targetNode.NextNode;
+      targetNode = null;
     }
+    Length--;
+    return true;
+  }
 }
 ...
 ```
@@ -370,31 +370,31 @@ public bool Remove(int index)
 ...
 public Node<T> Peek()
 {
-    return Head;
+  return Head;
 }
 
 public int GetLength()
 {
-    return Length;
+  return Length;
 }
 
 public Node<T> GetNode(int index)
 {
-    if (IsEmpty() || !IsInvalidIndex(index))
-    {
-        return null;
-    }
-    else
-    {
-        Node<T> targetNode = Head;
+  if (IsEmpty() || !IsInvalidIndex(index))
+  {
+    return null;
+  }
+  else
+  {
+    Node<T> targetNode = Head;
 
-        for (int i = 0; i < index; i++)
-        {
-            targetNode = targetNode.NextNode;
-        }
-
-        return targetNode;
+    for (int i = 0; i < index; i++)
+    {
+      targetNode = targetNode.NextNode;
     }
+
+    return targetNode;
+  }
 }
 ...
 ```
@@ -412,266 +412,266 @@ using System;
 // 노드 클래스
 public class Node<T>
 {
-    // 노드의 값과 다음 노드 객체
-    public T Data { get; set; }
-    public Node<T> NextNode { get; set; }
+  // 노드의 값과 다음 노드 객체
+  public T Value { get; set; }
+  public Node<T> NextNode { get; set; }
 
-    // 생성자
-    public Node(T data)
-    {
-        this.Data = data;
-    }
+  // 생성자
+  public Node(T value)
+  {
+    this.Value = value;
+  }
 }
 
 // 연결 리스트 클래스
 public class SinglyLinkedList<T>
 {
-    // 머리 노드, 꼬리 노드, 연결 리스트 길이
-    public Node<T> Head;
-    public Node<T> Tail;
-    public int Length = 0;
+  // 머리 노드, 꼬리 노드, 연결 리스트 길이
+  public Node<T> Head;
+  public Node<T> Tail;
+  public int Length = 0;
 
-    // 인덱스 값이 유효한지 확인
-    private bool IsInvalidIndex(int index)
+  // 인덱스 값이 유효한지 확인
+  private bool IsInvalidIndex(int index)
+  {
+    // 인덱스가 0 미만이거나,
+    // 연결 리스트 길이를 초과할 경우 false 반환
+    if (0 > index || getLength() - 1 < index)
     {
-        // 인덱스가 0 미만이거나,
-        // 연결 리스트 길이를 초과할 경우 false 반환
-        if (0 > index || getLength() - 1 < index)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+      return false;
     }
+    else
+    {
+      return true;
+    }
+  }
+
+  // 연결 리스트가 비어 있는지 확인
+  public bool IsEmpty()
+  {
+    // 머리 노드가 존재하지 않거나,
+    // 꼬리 노드가 존재하지 않거나,
+    // 연결 리스트에 노드가 존재하지 않을 시 true 반환
+    if (Head == null || Tail == null || Length == 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  // 꼬리 노드 다음에 새로운 노드 추가
+  public void Add(T value)
+  {
+    // 새로운 노드 생성
+    Node<T> newNode = new Node<T>(value);
 
     // 연결 리스트가 비어 있는지 확인
-    public bool IsEmpty()
+    if (IsEmpty())
     {
-        // 머리 노드가 존재하지 않거나,
-        // 꼬리 노드가 존재하지 않거나,
-        // 연결 리스트에 노드가 존재하지 않을 시 true 반환
-        if (Head == null || Tail == null || Length == 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+      // 새로운 노드는 머리 노드이자 꼬리 노드가 된다
+      Head = newNode;
+      Tail = newNode;
+      Length = 1;
     }
-
-    // 꼬리 노드 다음에 새로운 노드 추가
-    public void Add(T data)
+    else
     {
-        // 새로운 노드 생성
-        Node<T> newNode = new Node<T>(data);
-
-        // 연결 리스트가 비어 있는지 확인
-        if (IsEmpty())
-        {
-            // 새로운 노드는 머리 노드이자 꼬리 노드가 된다
-            Head = newNode;
-            Tail = newNode;
-            Length = 1;
-        }
-        else
-        {
-            // 연결 리스트에 노드가 한 개일 경우 실행
-            if (Length == 1)
-            {
-                // 새로운 노드는 꼬리 노드가 되고,
-                // 머리 노드의 다음 노드는 꼬리 노드가 된다
-                Tail = newNode;
-                Head.NextNode = Tail;
-            }
-            else
-            {
-                // 새로운 노드는 꼬리 노드의 다음 노드가 되고,
-                // 새로운 노드는 꼬리 노드가 된다
-                Tail.NextNode = newNode;
-                Tail = newNode;
-            }
-            Length++;
-        }
+      // 연결 리스트에 노드가 한 개일 경우 실행
+      if (Length == 1)
+      {
+        // 새로운 노드는 꼬리 노드가 되고,
+        // 머리 노드의 다음 노드는 꼬리 노드가 된다
+        Tail = newNode;
+        Head.NextNode = Tail;
+      }
+      else
+      {
+        // 새로운 노드는 꼬리 노드의 다음 노드가 되고,
+        // 새로운 노드는 꼬리 노드가 된다
+        Tail.NextNode = newNode;
+        Tail = newNode;
+      }
+      Length++;
     }
+  }
 
-    // 지정한 노드 다음에 새로운 노드 추가
-    public bool AddBefore(int index, T data)
+  // 지정한 노드 다음에 새로운 노드 추가
+  public bool AddBefore(int index, T value)
+  {
+    // 인덱스 값이 유효한지 확인
+    if (!IsInvalidIndex(index))
     {
-        // 인덱스 값이 유효한지 확인
-        if (!IsInvalidIndex(index))
-        {
-            return false;
-        }
-        else
-        {
-            // 새로운 노드 생성
-            // 이전 노드, 지정한 노드
-            Node<T> newNode = new Node<T>(data);
-            Node<T> beforeNode = null;
-            Node<T> targetNode = Head;
-
-            // 노드 검색
-            for (int i = 0; i < index; i++)
-            {
-                beforeNode = targetNode;
-                targetNode = targetNode.NextNode;
-            }
-
-            // 지정한 노드가 머리 노드일 경우 실행
-            if (targetNode == Head)
-            {
-                // 머리 노드는 새로운 노드의 다음 노드가 되고,
-                // 새로운 노드는 머리 노드가 된다
-                newNode.NextNode = Head;
-                Head = newNode;
-            }
-            else
-            {
-                // 새로운 노드는 이전 노드의 다음 노드가 되고,
-                // 지정한 노드는 새로운 노드의 다음 노드가 된다
-                beforeNode.NextNode = newNode;
-                newNode.NextNode = targetNode;
-            }
-            Length++;
-            return true;
-        }
+      return false;
     }
-
-    // 지정한 노드 이전에 새로운 노드 추가
-    public bool AddAfter(int index, T data)
+    else
     {
-        // 인덱스 값이 유효한지 확인
-        if (!IsInvalidIndex(index))
-        {
-            return false;
-        }
-        else
-        {
-            // 새로운 노드 생성
-            // 지정한 노드
-            Node<T> newNode = new Node<T>(data);
-            Node<T> targetNode = Head;
+      // 새로운 노드 생성
+      // 이전 노드, 지정한 노드
+      Node<T> newNode = new Node<T>(value);
+      Node<T> beforeNode = null;
+      Node<T> targetNode = Head;
 
-            // 노드 검색
-            for (int i = 0; i < index; i++)
-            {
-                targetNode = targetNode.NextNode;
-            }
+      // 노드 검색
+      for (int i = 0; i < index; i++)
+      {
+        beforeNode = targetNode;
+        targetNode = targetNode.NextNode;
+      }
 
-            // 지정한 노드가 꼬리 노드일 경우 실행
-            if (targetNode == Tail)
-            {
-                // 새로운 노드는 꼬리 노드의 다음 노드가 되고,
-                // 새로운 노드는 꼬리가 된다
-                Tail.NextNode = newNode;
-                Tail = newNode;
-            }
-            else
-            {
-                // 지정한 노드의 다음 노드는 새로운 노드의 다음 노드가 되고,
-                // 새로운 노드는 지정한 노드의 다음 노드가 된다
-                newNode.NextNode = targetNode.NextNode;
-                targetNode.NextNode = newNode;
-            }
-            Length++;
-            return true;
-        }
+      // 지정한 노드가 머리 노드일 경우 실행
+      if (targetNode == Head)
+      {
+        // 머리 노드는 새로운 노드의 다음 노드가 되고,
+        // 새로운 노드는 머리 노드가 된다
+        newNode.NextNode = Head;
+        Head = newNode;
+      }
+      else
+      {
+        // 새로운 노드는 이전 노드의 다음 노드가 되고,
+        // 지정한 노드는 새로운 노드의 다음 노드가 된다
+        beforeNode.NextNode = newNode;
+        newNode.NextNode = targetNode;
+      }
+      Length++;
+      return true;
     }
+  }
 
-    // 지정한 노드 삭제
-    public bool Remove(int index)
+  // 지정한 노드 이전에 새로운 노드 추가
+  public bool AddAfter(int index, T value)
+  {
+    // 인덱스 값이 유효한지 확인
+    if (!IsInvalidIndex(index))
     {
-        // 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인
-        if (IsEmpty() || !IsInvalidIndex(index))
-        {
-            return false;
-        }
-        else
-        {
-            // 이전 노드, 지정한 노드
-            Node<T> beforeNode = null;
-            Node<T> targetNode = Head;
-
-            // 노드 검색
-            for (int i = 0; i < index; i++)
-            {
-                beforeNode = targetNode;
-                targetNode = targetNode.NextNode;
-            }
-
-            // 연결 리스트에 노드가 한 개일 경우 실행
-            if (Length == 1)
-            {
-                // 머리 노드, 꼬리 노드 참조 해제
-                Head = null;
-                Tail = null;
-            }
-            // 지정한 노드가 머리 노드일 경우 실행
-            else if (targetNode == Head)
-            {
-                // 머리 노드의 다음 노드는 머리 노드가 되고,
-                // 지정한 노드의 참조를 해제한다
-                Head = Head.NextNode;
-                targetNode = null;
-            }
-            else if (targetNode == Tail)
-            {
-                // 꼬리 노드의 이전 노드는 꼬리 노드가 되고,
-                // 꼬리 노드의 다음 노드와 지정 노드의 참조를 해제한다
-                Tail = beforeNode;
-                Tail.NextNode = null;
-                targetNode = null;
-            }
-            else
-            {
-                // 지정한 노드의 다음 노드는 이전 노드의 다음 노드가 되고,
-                // 지정한 노드의 참조를 해제한다
-                beforeNode.NextNode = targetNode.NextNode;
-                targetNode = null;
-            }
-            Length--;
-            return true;
-        }
+      return false;
     }
-
-    // 첫 노드를 반환
-    public Node<T> Peek()
+    else
     {
-        return Head;
-    }
+      // 새로운 노드 생성
+      // 지정한 노드
+      Node<T> newNode = new Node<T>(value);
+      Node<T> targetNode = Head;
 
-    // 연결 리스트의 길이를 반환
-    public int GetLength()
+      // 노드 검색
+      for (int i = 0; i < index; i++)
+      {
+        targetNode = targetNode.NextNode;
+      }
+
+      // 지정한 노드가 꼬리 노드일 경우 실행
+      if (targetNode == Tail)
+      {
+        // 새로운 노드는 꼬리 노드의 다음 노드가 되고,
+        // 새로운 노드는 꼬리가 된다
+        Tail.NextNode = newNode;
+        Tail = newNode;
+      }
+      else
+      {
+        // 지정한 노드의 다음 노드는 새로운 노드의 다음 노드가 되고,
+        // 새로운 노드는 지정한 노드의 다음 노드가 된다
+        newNode.NextNode = targetNode.NextNode;
+        targetNode.NextNode = newNode;
+      }
+      Length++;
+      return true;
+    }
+  }
+
+  // 지정한 노드 삭제
+  public bool Remove(int index)
+  {
+    // 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인
+    if (IsEmpty() || !IsInvalidIndex(index))
     {
-        return Length;
+      return false;
     }
-
-    // 지정한 노드를 반환
-    public Node<T> GetNode(int index)
+    else
     {
-        // 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인
-        if (IsEmpty() || !IsInvalidIndex(index))
-        {
-            return null;
-        }
-        else
-        {
-            // 지정한 노드
-            Node<T> targetNode = Head;
+      // 이전 노드, 지정한 노드
+      Node<T> beforeNode = null;
+      Node<T> targetNode = Head;
 
-            // 노드 검색
-            for (int i = 0; i < index; i++)
-            {
-                targetNode = targetNode.NextNode;
-            }
+      // 노드 검색
+      for (int i = 0; i < index; i++)
+      {
+        beforeNode = targetNode;
+        targetNode = targetNode.NextNode;
+      }
 
-            // 지정한 노드 반환
-            return targetNode;
-        }
+      // 연결 리스트에 노드가 한 개일 경우 실행
+      if (Length == 1)
+      {
+        // 머리 노드, 꼬리 노드 참조 해제
+        Head = null;
+        Tail = null;
+      }
+      // 지정한 노드가 머리 노드일 경우 실행
+      else if (targetNode == Head)
+      {
+        // 머리 노드의 다음 노드는 머리 노드가 되고,
+        // 지정한 노드의 참조를 해제한다
+        Head = Head.NextNode;
+        targetNode = null;
+      }
+      else if (targetNode == Tail)
+      {
+        // 꼬리 노드의 이전 노드는 꼬리 노드가 되고,
+        // 꼬리 노드의 다음 노드와 지정 노드의 참조를 해제한다
+        Tail = beforeNode;
+        Tail.NextNode = null;
+        targetNode = null;
+      }
+      else
+      {
+        // 지정한 노드의 다음 노드는 이전 노드의 다음 노드가 되고,
+        // 지정한 노드의 참조를 해제한다
+        beforeNode.NextNode = targetNode.NextNode;
+        targetNode = null;
+      }
+      Length--;
+      return true;
     }
+  }
+
+  // 첫 노드를 반환
+  public Node<T> Peek()
+  {
+    return Head;
+  }
+
+  // 연결 리스트의 길이를 반환
+  public int getLength()
+  {
+    return Length;
+  }
+
+  // 지정한 노드를 반환
+  public Node<T> getNode(int index)
+  {
+    // 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인
+    if (IsEmpty() || !IsInvalidIndex(index))
+    {
+      return null;
+    }
+    else
+    {
+      // 지정한 노드
+      Node<T> targetNode = Head;
+
+      // 노드 검색
+      for (int i = 0; i < index; i++)
+      {
+        targetNode = targetNode.NextNode;
+      }
+
+      // 지정한 노드 반환
+      return targetNode;
+    }
+  }
 }
 ```
 </details>
@@ -690,6 +690,161 @@ Head와 Tail노드를 갖고 있다면 둘 중 하나를 가지고 전체 리스
 예를 들어 next포인터는 갱신을 했는데 prev포인터는 갱신하지 않았을 경우 prev포인터를 따라가는 순회에서 도달 불가능한 '잃어버린' 노드가 발생한다.
 
 ### 구현
+```c#
+public class Node<T>
+{
+  ...
+  public Node<T> PrevNode { get; set; }
+  ...
+}
+```
+기존 노드 클래스에서 이전 노드 참조를 위한 변수인 PrevNode 필드를 추가한다.
+
+```c#
+...
+public void Add(T data)
+{
+  ...
+  if (IsEmpty())
+  {
+    ...
+  }
+  else
+  {
+    if (Length == 1)
+    {
+      ...
+      Tail.PrevNode = Head;
+    }
+    else
+    {
+      ...
+      newNode.PrevNode = Tail;
+      ...
+    }
+    ...
+  }
+}
+...
+```
+단일 연결 리스트의 Add 함수에서 노드가 실제로 추가될 경우 이전 노드 참조 동작을 수행하도록 변경한다.
+
+```c#
+...
+public bool AddBefore(int index, T data)
+{
+  if (!IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    Node<T> newNode = new Node<T>(data);
+    Node<T> targetNode = Head;
+
+    for (int i = 0; i < index; i++)
+    {
+      targetNode = targetNode.NextNode;
+    }
+
+    if (targetNode == Head)
+    {
+      newNode.NextNode = Head;
+      Head.PrevNode = newNode;
+      Head = newNode;
+    }
+    else
+    {
+      targetNode.PrevNode.NextNode = newNode;
+      newNode.NextNode = targetNode;
+      newNode.PrevNode = targetNode.PrevNode;
+    }
+  }
+  Length++;
+  return true;
+}
+...
+```
+이전 노드 참조 변수를 따로 저장하지 않아도 PrevNode 멤버 변수로 이전 노드를 참조할 수 있기 때문에 기존 AddBefore 함수에서 지정 노드와 이전 노드를 둘 다 저장하던 방식을 지정 노드만 검색하는 방식으로 변경한다.   
+노드 추가 작업을 할 경우 새 노드의 이전 노드 필드가 지정 노드의 이전 노드를 참조하는 기능을 추가한다.
+
+```c#
+...
+public bool AddAfter(int index, T data)
+{
+  if (!IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    ...
+
+    if (targetNode == Tail)
+    {
+      newNode.PrevNode = Tail;
+      ...
+    }
+    else
+    {
+      newNode.PrevNode = targetNode;
+      ...
+    }
+    ...
+  }
+}
+...
+```
+기존 AddAfter 함수에서 노드를 추가할 때 새 노드의 이전 노드가 지정 노드를 참조하는 기능을 추가한다.
+
+```c#
+...
+public bool Remove(int index)
+{
+  if (IsEmpty() || !IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    Node<T> targetNode = Head;
+
+    for (int i = 0; i < index; i++)
+    {
+      targetNode = targetNode.NextNode;
+    }
+
+    if (Length == 1)
+    {
+      ...
+    }
+    else if (targetNode == Head)
+    {
+      Head = Head.NextNode;
+      Head.PrevNode = null;
+      targetNode = null;
+    }
+    else if (targetNode == Tail)
+    {
+      Tail = Tail.PrevNode;
+      Tail.NextNode = null;
+      targetNode = null;
+    }
+    else
+    {
+      targetNode.PrevNode.NextNode = targetNode.NextNode;
+      targetNode.NextNode.PrevNode = targetNode.PrevNode;
+      targetNode = null;
+    }
+    Length--;
+    return true;
+  }
+}
+...
+```
+PrevNode 의 존재로 이전 노드를 검색할 필요가 없으므로 beforeNode 변수를 삭제하고 대신 targetNode.PrevNode 가 기존 기능을 수행한다.  
+머리 노드와 꼬리 노드를 삭제할 때 각각 노드를 두 번째, 마지막 전 노드로 교체한 후 이전, 다음 노드의 참조를 null로 변경한다.   
+일반적인 경우 지정 노드의 이전 노드가 다음 노드로 지정 노드의 다음 노드를 참조하도록 하고, 지정 노드의 다음 노드가 이전 노드로 지정 노드의 이전 노드를 참조한 후 지정 노드의 참조를 해제하여 메모리에서 지정 노드를 삭제하는 동시에 지정 노드 앞 뒤 노드를 연결한다.
 
 [파일](/sample_code/DoublyLinkedList.cs)
 <details>
