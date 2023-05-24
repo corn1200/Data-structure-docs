@@ -1076,7 +1076,7 @@ public class DoubleLinkedList<T>
       // 지정한 노드가 꼬리 노드일 경우 실행
       else if (targetNode == Tail)
       {
-        // 꼬리 노드의 다음 노드는 머리 노드가 된다
+        // 꼬리 노드의 이전 노드는 꼬리 노드가 된다
         // 꼬리 노드의 다음 노드 참조를 해제한다
         // 지정한 노드의 참조를 해제한다
         Tail = Tail.PrevNode;
