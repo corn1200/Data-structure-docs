@@ -1146,6 +1146,155 @@ public class DoubleLinkedList<T>
 이미 할당된 메모리 공간을 삭제하고 재할당하는 부담이 없기 때문에 큐를 구현하는 데에도 적합하다.
 
 ### 구현
+```c#
+...
+public void Add(T data)
+{
+  ...
+
+  if (IsEmpty())
+  {
+    newNode.NextNode = newNode;
+    newNode.PrevNode = newNode;
+    ...
+  }
+  else
+  {
+    if (Length == 1)
+    {
+      ...
+      Head.PrevNode = Tail;
+      Tail.NextNode = Head;
+      ...
+    }
+    else
+    {
+      ...
+      newNode.NextNode = Head;
+      ...
+    }
+    Length++;
+  }
+}
+...
+```
+기존 이중 연결 리스트의 Add 함수에서 Head와 Tail의 연결 동작을 추가한다.   
+첫 번째 노드 생성의 경우 새 노드의 이전, 다음 노드로 자기 자신을 참조하도록 한다.   
+두 번째 노드 생성의 경우 기존의 Head와 Tail 분리 작업 동시에 Head는 이전 노드로 Tail을 참조하고, Tail은 다음 노드로 Head를 참조하도록 한다.   
+일반적인 경우엔 Tail이 될 새 노드의 다음 노드로 Head를 참조하도록 한다.
+
+```c#
+...
+public bool AddBefore(int index, T data)
+{
+  if (!IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    ...
+
+    for (int i = 0; i < index; i++)
+    {
+      ...
+    }
+
+    if (targetNode == Head)
+    {
+      ...
+      newNode.PrevNode = Tail;
+      ...
+    }
+    else
+    {
+      ...
+    }
+  }
+  ...
+}
+...
+```
+기존 이중 연결 리스트의 AddBefore 함수에서 지정 노드가 Head일 경우, 새로 추가될 노드(Head가 될 노드)가 이전 노드로 Tail을 참조하도록 한다.
+
+```c#
+...
+public bool AddAfter(int index, T data)
+{
+  if (!IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    ...
+
+    for (int i = 0; i < index; i++)
+    {
+      ...
+    }
+
+    if (targetNode == Tail)
+    {
+      ...
+      newNode.NextNode = Head;
+      ...
+    }
+    else
+    {
+      ...
+    }
+    ...
+  }
+}
+...
+```
+기존 이중 연결 리스트의 AddAfter 함수에서 지정 노드가 Tail일 경우, 새로 추가될 노드(Tail이 될 노드)가 다음 노드로 Head를 참조하도록 한다.
+
+```c#
+...
+public bool Remove(int index)
+{
+  if (IsEmpty() || !IsInvalidIndex(index))
+  {
+    ...
+  }
+  else
+  {
+    ...
+
+    for (int i = 0; i < index; i++)
+    {
+      ...
+    }
+
+    if (Length == 1)
+    {
+      ...
+    }
+    else if (targetNode == Head)
+    {
+      Head = Head.NextNode;
+      Head.PrevNode = Tail;
+      targetNode = null;
+    }
+    else if (targetNode == Tail)
+    {
+      Tail = Tail.PrevNode;
+      Tail.NextNode = Head;
+      targetNode = null;
+    }
+    else
+    {
+      ...
+    }
+    ...
+  }
+}
+...
+```
+기존 이중 연결 리스트의 Remove 함수에서 지정 노드가 Head, Tail일 경우의 동작을 수정한다.  
+기존에 새로 Head, Tail이 된 노드의 이전, 다음 노드 참조를 해제하던 동작을 Head일 경우 이전 노드로 Tail을 참조하고 Tail일 경우 다음 노드로 Head를 참조하도록 수정한다.
 
 [파일](/sample_code/CircularLinkedList.cs)
 <details>
