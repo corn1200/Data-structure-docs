@@ -1628,3 +1628,63 @@ index가 초기 배열 크기 이상이면 스택이 꽉 찬 것이다.
 연결 리스트로 구현하는 방법은 보다 단순하다.  
 메모리 상에 아이템을 위한 공간을 할당하고 새로운 아이템이 추가될 때 마다 포인터로 연결하기만 하면 된다.   
 아래 그림에서 좌측 ADT는 스택의 연산을 지원하기 위해 1부터 5까지 각 요소가 접시 쌓듯 차곡차곡 놓여있지만, 실제로 연결 리스트로 구현하게 된다면 물리 메모리 상에는 순서와 관계 없이 여기저기에 무작위로 배치되고 포인터로 가리키게 될 것이다.
+
+### 구현
+
+[파일](/sample_code/Stack.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
+using System;
+
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+
+  public Node(T data)
+  {
+    this.Data = data;
+  }
+}
+
+public class Stack<T>
+{
+  private Node<T> _head;
+  public Node<T> Head { get { return _head; } set { _head = value; } }
+  public int Count { get; set; } = 0;
+
+  public void Push(T data)
+  {
+    Node<T> newNode = new Node<T>(data);
+    if (Count > 0)
+    {
+      newNode.NextNode = Head;
+    }
+    Head = newNode;
+    Count++;
+  }
+
+  public Node<T> Pop()
+  {
+    if (Count > 0)
+    {
+      Node<T> headNode = Head;
+      Head = headNode.NextNode;
+      Count--;
+      return headNode;
+    }
+    else
+    {
+      return null;
+    }
+  }
+
+  public Node<T> Peek()
+  {
+    return Head;
+  }
+}
+```
+</details>
