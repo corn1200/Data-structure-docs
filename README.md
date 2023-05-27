@@ -1666,24 +1666,32 @@ public class Stack<T>
     Count++;
   }
 
-  public Node<T> Pop()
+  public T Pop()
   {
     if (Count > 0)
     {
       Node<T> headNode = Head;
       Head = headNode.NextNode;
       Count--;
-      return headNode;
+      return headNode.Data;
     }
     else
     {
-      return null;
+      return default(T);
     }
   }
 
-  public Node<T> Peek()
+  public T Peek()
   {
-    return Head;
+    if (Count > 0)
+    {
+      return Head.Data;
+
+    }
+    else
+    {
+      return default(T);
+    }
   }
 }
 ```
