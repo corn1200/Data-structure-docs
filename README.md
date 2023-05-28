@@ -1637,6 +1637,7 @@ index가 초기 배열 크기 이상이면 스택이 꽉 찬 것이다.
 
 ```c#
 using System;
+using System.Collections;
 
 public class Node<T>
 {
@@ -1654,6 +1655,14 @@ public class Stack<T>
   private Node<T> _head;
   public Node<T> Head { get { return _head; } set { _head = value; } }
   public int Count { get; set; } = 0;
+
+  public IEnumerator GetEnumerator()
+  {
+    for (int i = 0; i < Count; ++i)
+    {
+      yield return _head.Data;
+    }
+  }
 
   public void Push(T data)
   {

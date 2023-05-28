@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 public class Node<T>
 {
@@ -16,6 +17,14 @@ public class Stack<T>
   private Node<T> _head;
   public Node<T> Head { get { return _head; } set { _head = value; } }
   public int Count { get; set; } = 0;
+
+  public IEnumerator GetEnumerator()
+  {
+    for (int i = 0; i < Count; ++i)
+    {
+      yield return _head.Data;
+    }
+  }
 
   public void Push(T data)
   {
