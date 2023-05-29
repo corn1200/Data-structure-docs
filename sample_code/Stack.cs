@@ -20,9 +20,11 @@ public class Stack<T>
 
   public IEnumerator GetEnumerator()
   {
-    for (int i = 0; i < Count; ++i)
+    Node<T> currNode = Head;
+    while (currNode != null)
     {
-      yield return _head.Data;
+      yield return currNode.Data;
+      currNode = currNode.NextNode;
     }
   }
 
