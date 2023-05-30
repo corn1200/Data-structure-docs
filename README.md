@@ -1630,6 +1630,147 @@ index가 초기 배열 크기 이상이면 스택이 꽉 찬 것이다.
 아래 그림에서 좌측 ADT는 스택의 연산을 지원하기 위해 1부터 5까지 각 요소가 접시 쌓듯 차곡차곡 놓여있지만, 실제로 연결 리스트로 구현하게 된다면 물리 메모리 상에는 순서와 관계 없이 여기저기에 무작위로 배치되고 포인터로 가리키게 될 것이다.
 
 ### 구현
+```c#
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+
+  public Node(T data)
+  {
+    this.Data = data;
+  }
+}
+```
+스택 구현 및 데이터 연결을 위한 노드 클래스
+
+```c#
+public class Stack<T>
+{
+  private Node<T> Head { get; set; }
+  public int Count { get; set; }
+  ...
+}
+```
+최상단 노드는 외부에서 접근하지 못하도록 private로 선언하고, 스택 크기 저장을 위한 Count 필드를 선언한다.
+
+```c#
+...
+public Stack()
+{
+  Head = null;
+  Count = 0;
+}
+
+public Stack(IEnumerable<T> items) : this()
+{
+  foreach (var item in items)
+  {
+    Push(item);
+  }
+}
+...
+```
+기본 생성자와 Enumerable 객체를 파라미터로 받는 생성자를 추가한다.  
+Enumerable 객체를 받아서 foreach 후 데이터를 하나씩 스택에 삽입한다.
+
+```c#
+...
+public IEnumerator GetEnumerator()
+{
+  Node<T> currNode = Head;
+  while (currNode != null)
+  {
+    yield return currNode.Data;
+    currNode = currNode.NextNode;
+  }
+}
+...
+```
+IEnumerator 인터페이스를 구현하여 Stack 인스턴스를 foreach문으로 반복시킬 수 있도록 한다.
+
+```c#
+...
+public void Push(T data)
+{
+  Node<T> newNode = new Node<T>(data);
+
+  newNode.NextNode = Head;
+  Head = newNode;
+
+  Count++;
+}
+...
+```
+스택에 새 데이터를 삽입하기 위해 새 노드를 생성하고 최상단 노드를 교체한다.
+
+```c#
+...
+public T Pop()
+{
+  Node<T> headNode = Head;
+
+  T data = headNode.Data;
+  Head = headNode.NextNode;
+  headNode = null;
+
+  Count--;
+  return data;
+}
+...
+```
+스택에서 데이터를 제거하는 동시에 제거한 데이터를 반환한다.   
+최상단 노드 데이터 저장 및 최상단 노드 교체 후 이전 최상단 노드의 참조를 해제한다.
+
+```c#
+...
+public T Peek()
+{
+  return Head.Data;
+}
+
+public void Clear()
+{
+  Head = null;
+  Count = 0;
+}
+...
+```
+다음번에 제거 될 최상단 노드의 데이터를 조회하는 함수와 스택 내 데이터를 모두 삭제하는 함수를 작성한다.
+
+```c#
+...
+public T[] ToArray()
+{
+  T[] newArray = new T[Count];
+
+  int i = 0;
+  foreach (T t in this)
+  {
+    newArray[i] = t;
+    i++;
+  }
+  return newArray;
+}
+...
+```
+현재 스택을 배열로 변화 후 반환한다.  
+새 배열을 선언한 뒤 현재 객체를 foreach로 반복하여 배열에 값을 추가한 후 배열을 반환한다.
+
+```c#
+...
+public void CopyTo(T[] array, int arrayIndex)
+{
+  foreach (T t in this)
+  {
+    array[arrayIndex] = t;
+    arrayIndex++;
+  }
+}
+...
+```
+지정한 배열의 지정한 인덱스부터 스택 값을 복사한다.   
+현재 객체를 foreach로 반복하며 지정한 배열에 데이터를 추가한다.
 
 [파일](/sample_code/Stack.cs)
 <details>
