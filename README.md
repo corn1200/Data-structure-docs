@@ -1922,6 +1922,133 @@ public class Stack<T>
 연결 리스트를 사용하면 배열에 비해 매우 쉽게 구현이 가능하다.
 
 ## 4.1. 단순 큐
+[파일](/sample_code/Queue.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
+using System;
+using System.Collections;
+
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+  public Node<T> PrevNode { get; set; }
+
+  public Node(T data)
+  {
+    Data = data;
+  }
+}
+
+public class Queue<T>
+{
+  private Node<T> Head { get; set; }
+  private Node<T> Tail { get; set; }
+  public int Count { get; set; }
+
+  public Queue()
+  {
+    Head = null;
+    Tail = null;
+    Count = 0;
+  }
+
+  public Queue(IEnumerable<T> items) : this()
+  {
+    foreach (var item in items)
+    {
+      Enqueue(item);
+    }
+  }
+
+  public IEnumerator GetEnumerator()
+  {
+    Node<T> currNode = Head;
+    while (currNode != null)
+    {
+      yield return currNode.Data;
+      currNode = currNode.NextNode;
+    }
+  }
+
+  public void Enqueue(T data)
+  {
+    Node<T> newNode = new Node<T>(data);
+
+    if (IsEmpty())
+    {
+      Head = newNode;
+      Tail = newNode;
+    }
+    else
+    {
+      Tail.NextNode = newNode;
+      newNode.PrevNode = Tail;
+      Tail = newNode;
+    }
+
+    Count++;
+  }
+
+  public T Dequeue()
+  {
+    T data = Head.Data;
+    Head = Head.NextNode;
+    Head.PrevNode = null;
+
+    Count--;
+    return data;
+  }
+
+  public T Peek()
+  {
+    return Tail.Data;
+  }
+
+  public void Clear()
+  {
+    Head = null;
+    Tail = null;
+    Count = 0;
+  }
+
+  public T[] ToArray()
+  {
+    T[] newArray = new T[Count];
+
+    int i = 0;
+    foreach (T t in this)
+    {
+      newArray[i] = t;
+      i++;
+    }
+    return newArray;
+  }
+
+  public void CopyTo(T[] array, int arrayIndex)
+  {
+    foreach (T t in this)
+    {
+      array[arrayIndex] = t;
+      arrayIndex++;
+    }
+  }
+
+  public bool IsEmpty()
+  {
+    if (Head == null || Tail == null || Count <= 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+}
+```
 
 ## 4.2. 원형 큐
 큐를 위해 배열을 지정해 놓고 큐를 쓰다보면 배열의 앞부분이 비게된다는 점을 활용해서 배열의 맨 마지막 부분을 쓰면 다시 제일 처음부터 큐를 채우기 시작하는 형태의 큐이다.   
