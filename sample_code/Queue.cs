@@ -65,17 +65,34 @@ public class Queue<T>
 
   public T Dequeue()
   {
-    T data = Head.Data;
-    Head = Head.NextNode;
-    Head.PrevNode = null;
-
-    Count--;
-    return data;
+    if (Count > 0)
+    {
+      T data = Head.Data;
+      if (Count == 1)
+      {
+        Clear();
+      }
+      else
+      {
+        Head = Head.NextNode;
+        Head.PrevNode = null;
+        Count--;
+      }
+      return data;
+    }
+    return default(T);
   }
 
   public T Peek()
   {
-    return Tail.Data;
+    if (IsEmpty())
+    {
+      return default(T);
+    }
+    else
+    {
+      return Head.Data;
+    }
   }
 
   public void Clear()
