@@ -156,7 +156,7 @@ public class SinglyLinkedList<T>
   public Node<T> Head;
   public Node<T> Tail;
   public int Length = 0;
-  ...
+  // ...
 }
 ```
 연결 리스트 클래스는 머리 노드와 꼬리 노드, 연결 리스트의 길이를 저장하는 변수를 필드로 가진다.     
@@ -164,7 +164,7 @@ public class SinglyLinkedList<T>
 길이 변수는 index 값 유효 검증, 노드가 한 개일 경우(Head = Tail)의 예외 처리, 노드의 길이 출력 등에 쓰인다.
 
 ```c#
-...
+// ...
 private bool IsInvalidIndex(int index)
 {
   if (0 > index || getLength() - 1 < index)
@@ -176,13 +176,13 @@ private bool IsInvalidIndex(int index)
     return true;
   }
 }
-...
+// ...
 ```
 연결 리스트 클래스 내부에서만 사용할 인덱스 유효 확인 함수를 작성한다.  
 매개변수 index의 값이 0보다 미만이거나, 현재 연결 리스트 길이(0부터 번호 매김)를 초과하는지 확인 후 index 값이 유효하지 않을 경우 false를 반환한다.
 
 ```c#
-...
+// ...
 public bool IsEmpty()
 {
   if (Head == null || Tail == null || Length == 0)
@@ -194,14 +194,14 @@ public bool IsEmpty()
     return false;
   }
 }
-...
+// ...
 ```
 연결 리스트의 비어 있는지 확인하는 함수를 작성한다.     
 머리 노드, 꼬리 노드가 아무 노드도 참조하고 있지 않거나 연결 리스트의 길이가 0이면 노드가 존재하지 않는 것으로 취급하여 true를 반환하고 그렇지 않을 경우 노드가 한 개 이상 존재하는 것으로 취급하고 false를 반환한다.     
 노드 추가, 노드 삭제, 노드 검색 등 함수에서 비어 있는 연결 리스트 예외처리에 사용된다.
 
 ```c#
-...
+// ...
 public void Add(T data)
 {
   Node<T> newNode = new Node<T>(data);
@@ -227,7 +227,7 @@ public void Add(T data)
     Length++;
   }
 }
-...
+// ...
 ```
 연결 리스트의 가장 마지막에 새 노드를 추가하는 함수를 작성한다.     
 매개변수 data로 새로운 노드 객체를 생성하고 현재 리스트가 비어 있으면 새로운 노드는 머리이자 꼬리 노드가 된다(Head, Tail 둘 다 새 노드 객체를 참조).  
@@ -235,7 +235,7 @@ public void Add(T data)
 일반적인 경우엔 현재 꼬리 노드는 다음 노드로 새 노드를 참조하고, 리스트의 꼬리 노드를 가리키는 Tail은 새 노드를 참조하게 된다.
 
 ```c#
-...
+// ...
 public bool AddBefore(int index, T data)
 {
   if (!IsInvalidIndex(index))
@@ -268,7 +268,7 @@ public bool AddBefore(int index, T data)
     return true;
   }
 }
-...
+// ...
 ```
 원하는 노드 위치의 이전에 새 노드를 추가하는 함수를 작성한다.   
 매개변수 index가 유효한지 검사 후 유효한 하지 않은 경우 동작을 실행할 수 없다는 의미의 false를 반환한다.    
@@ -277,7 +277,7 @@ public bool AddBefore(int index, T data)
 일반적인 경우엔 이전 노드가 다음 노드로 새 노드를 참조하도록 하고, 새 노드가 다음 노드로 타겟 노드를 참조하도록 한다.
 
 ```c#
-...
+// ...
 public bool AddAfter(int index, T data)
 {
   if (!IsInvalidIndex(index))
@@ -308,7 +308,7 @@ public bool AddAfter(int index, T data)
     return true;
   }
 }
-...
+// ...
 ```
 원하는 노드 위치의 다음에 새 노드를 추가하는 함수를 작성한다.   
 매개변수 index가 유효한지 검사 후 유효한 하지 않은 경우 동작을 실행할 수 없다는 의미의 false를 반환한다.    
@@ -317,7 +317,7 @@ public bool AddAfter(int index, T data)
 일반적인 경우엔 새 노드가 다음 노드로 타겟 노드의 다음 노드를 참조하도록 하고, 타겟 노드가 다음 노드로 새 노드를 참조하도록 한다.
 
 ```c#
-...
+// ...
 public bool Remove(int index)
 {
   if (IsEmpty() || !IsInvalidIndex(index))
@@ -360,7 +360,7 @@ public bool Remove(int index)
     return true;
   }
 }
-...
+// ...
 ```
 원하는 위치의 노드를 삭제하는 함수를 작성한다.  
 노드가 비어 있는지, 유효한 index인지 확인 후 Remove 작업을 실행할 수 없을 경우 false를 반환한다.    
@@ -370,7 +370,7 @@ public bool Remove(int index)
 일반적인 경우엔 이전 노드의 다음 노드 변수가 타겟 노드의 다음 노드를 참조하도록 하고, 마찬가지로 타겟 노드의 참조를 해제한다.
 
 ```c#
-...
+// ...
 public Node<T> Peek()
 {
   return Head;
@@ -399,7 +399,7 @@ public Node<T> GetNode(int index)
     return targetNode;
   }
 }
-...
+// ...
 ```
 연결 리스트의 첫 번째 노드를 반환하는 함수와 연결 리스트의 길이를 반환하는 함수, 특정 노드를 검색하고 반환하는 함수를 작성한다.     
 노드 검색 전 연결 리스트가 비어 있는지, 인덱스 값이 유효한지 확인한다.  
@@ -696,49 +696,49 @@ Head와 Tail노드를 갖고 있다면 둘 중 하나를 가지고 전체 리스
 ```c#
 public class Node<T>
 {
-  ...
+  // ...
   public Node<T> PrevNode { get; set; }
-  ...
+  // ...
 }
 ```
 기존 노드 클래스에서 이전 노드 참조를 위한 변수인 PrevNode 필드를 추가한다.
 
 ```c#
-...
+// ...
 public void Add(T data)
 {
-  ...
+  // ...
   if (IsEmpty())
   {
-    ...
+    // ...
   }
   else
   {
     if (Length == 1)
     {
-      ...
+      // ...
       Tail.PrevNode = Head;
     }
     else
     {
-      ...
+      // ...
       newNode.PrevNode = Tail;
-      ...
+      // ...
     }
-    ...
+    // ...
   }
 }
-...
+// ...
 ```
 단일 연결 리스트의 Add 함수에서 노드가 실제로 추가될 경우 이전 노드 참조 동작을 수행하도록 변경한다.
 
 ```c#
-...
+// ...
 public bool AddBefore(int index, T data)
 {
   if (!IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
@@ -766,47 +766,47 @@ public bool AddBefore(int index, T data)
   Length++;
   return true;
 }
-...
+// ...
 ```
 이전 노드 참조 변수를 따로 저장하지 않아도 PrevNode 멤버 변수로 이전 노드를 참조할 수 있기 때문에 기존 AddBefore 함수에서 지정 노드와 이전 노드를 둘 다 저장하던 방식을 지정 노드만 검색하는 방식으로 변경한다.   
 노드 추가 작업을 할 경우 새 노드의 이전 노드 필드가 지정 노드의 이전 노드를 참조하는 기능을 추가한다.
 
 ```c#
-...
+// ...
 public bool AddAfter(int index, T data)
 {
   if (!IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
-    ...
+    // ...
 
     if (targetNode == Tail)
     {
       newNode.PrevNode = Tail;
-      ...
+      // ...
     }
     else
     {
       newNode.PrevNode = targetNode;
-      ...
+      // ...
     }
-    ...
+    // ...
   }
 }
-...
+// ...
 ```
 기존 AddAfter 함수에서 노드를 추가할 때 새 노드의 이전 노드가 지정 노드를 참조하는 기능을 추가한다.
 
 ```c#
-...
+// ...
 public bool Remove(int index)
 {
   if (IsEmpty() || !IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
@@ -819,7 +819,7 @@ public bool Remove(int index)
 
     if (Length == 1)
     {
-      ...
+      // ...
     }
     else if (targetNode == Head)
     {
@@ -843,7 +843,7 @@ public bool Remove(int index)
     return true;
   }
 }
-...
+// ...
 ```
 PrevNode 의 존재로 이전 노드를 검색할 필요가 없으므로 beforeNode 변수를 삭제하고 대신 targetNode.PrevNode 가 기존 기능을 수행한다.  
 머리 노드와 꼬리 노드를 삭제할 때 각각 노드를 두 번째, 마지막 전 노드로 교체한 후 이전, 다음 노드의 참조를 null로 변경한다.   
@@ -1150,36 +1150,36 @@ public class DoubleLinkedList<T>
 
 ### 구현
 ```c#
-...
+// ...
 public void Add(T data)
 {
-  ...
+  // ...
 
   if (IsEmpty())
   {
     newNode.NextNode = newNode;
     newNode.PrevNode = newNode;
-    ...
+    // ...
   }
   else
   {
     if (Length == 1)
     {
-      ...
+      // ...
       Head.PrevNode = Tail;
       Tail.NextNode = Head;
-      ...
+      // ...
     }
     else
     {
-      ...
+      // ...
       newNode.NextNode = Head;
-      ...
+      // ...
     }
     Length++;
   }
 }
-...
+// ...
 ```
 기존 이중 연결 리스트의 Add 함수에서 Head와 Tail의 연결 동작을 추가한다.   
 첫 번째 노드 생성의 경우 새 노드의 이전, 다음 노드로 자기 자신을 참조하도록 한다.   
@@ -1187,93 +1187,93 @@ public void Add(T data)
 일반적인 경우엔 Tail이 될 새 노드의 다음 노드로 Head를 참조하도록 한다.
 
 ```c#
-...
+// ...
 public bool AddBefore(int index, T data)
 {
   if (!IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
-    ...
+    // ...
 
     for (int i = 0; i < index; i++)
     {
-      ...
+      // ...
     }
 
     if (targetNode == Head)
     {
-      ...
+      // ...
       newNode.PrevNode = Tail;
-      ...
+      // ...
     }
     else
     {
-      ...
+      // ...
     }
   }
-  ...
+  // ...
 }
-...
+// ...
 ```
 기존 이중 연결 리스트의 AddBefore 함수에서 지정 노드가 Head일 경우, 새로 추가될 노드(Head가 될 노드)가 이전 노드로 Tail을 참조하도록 한다.
 
 ```c#
-...
+// ...
 public bool AddAfter(int index, T data)
 {
   if (!IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
-    ...
+    // ...
 
     for (int i = 0; i < index; i++)
     {
-      ...
+      // ...
     }
 
     if (targetNode == Tail)
     {
-      ...
+      // ...
       newNode.NextNode = Head;
-      ...
+      // ...
     }
     else
     {
-      ...
+      // ...
     }
-    ...
+    // ...
   }
 }
-...
+// ...
 ```
 기존 이중 연결 리스트의 AddAfter 함수에서 지정 노드가 Tail일 경우, 새로 추가될 노드(Tail이 될 노드)가 다음 노드로 Head를 참조하도록 한다.
 
 ```c#
-...
+// ...
 public bool Remove(int index)
 {
   if (IsEmpty() || !IsInvalidIndex(index))
   {
-    ...
+    // ...
   }
   else
   {
-    ...
+    // ...
 
     for (int i = 0; i < index; i++)
     {
-      ...
+      // ...
     }
 
     if (Length == 1)
     {
-      ...
+      // ...
     }
     else if (targetNode == Head)
     {
@@ -1289,12 +1289,12 @@ public bool Remove(int index)
     }
     else
     {
-      ...
+      // ...
     }
-    ...
+    // ...
   }
 }
-...
+// ...
 ```
 기존 이중 연결 리스트의 Remove 함수에서 지정 노드가 Head, Tail일 경우의 동작을 수정한다.  
 기존에 새로 Head, Tail이 된 노드의 이전, 다음 노드 참조를 해제하던 동작을 Head일 경우 이전 노드로 Tail을 참조하고 Tail일 경우 다음 노드로 Head를 참조하도록 수정한다.
@@ -1651,13 +1651,13 @@ public class Stack<T>
 {
   private Node<T> Head { get; set; }
   public int Count { get; set; }
-  ...
+  // ...
 }
 ```
 최상단 노드는 외부에서 접근하지 못하도록 private로 선언하고, 스택 크기 저장을 위한 Count 필드를 선언한다.
 
 ```c#
-...
+// ...
 public Stack()
 {
   Head = null;
@@ -1671,13 +1671,13 @@ public Stack(IEnumerable<T> items) : this()
     Push(item);
   }
 }
-...
+// ...
 ```
 기본 생성자와 Enumerable 객체를 파라미터로 받는 생성자를 추가한다.  
 Enumerable 객체를 받아서 foreach 후 데이터를 하나씩 스택에 삽입한다.
 
 ```c#
-...
+// ...
 public IEnumerator GetEnumerator()
 {
   Node<T> currNode = Head;
@@ -1687,12 +1687,12 @@ public IEnumerator GetEnumerator()
     currNode = currNode.NextNode;
   }
 }
-...
+// ...
 ```
 IEnumerator 인터페이스를 구현하여 Stack 인스턴스를 foreach문으로 반복시킬 수 있도록 한다.
 
 ```c#
-...
+// ...
 public void Push(T data)
 {
   Node<T> newNode = new Node<T>(data);
@@ -1702,12 +1702,12 @@ public void Push(T data)
 
   Count++;
 }
-...
+// ...
 ```
 스택에 새 데이터를 삽입하기 위해 새 노드를 생성하고 최상단 노드를 교체한다.
 
 ```c#
-...
+// ...
 public T Pop()
 {
   Node<T> headNode = Head;
@@ -1719,13 +1719,13 @@ public T Pop()
   Count--;
   return data;
 }
-...
+// ...
 ```
 스택에서 데이터를 제거하는 동시에 제거한 데이터를 반환한다.   
 최상단 노드 데이터 저장 및 최상단 노드 교체 후 이전 최상단 노드의 참조를 해제한다.
 
 ```c#
-...
+// ...
 public T Peek()
 {
   return Head.Data;
@@ -1736,12 +1736,12 @@ public void Clear()
   Head = null;
   Count = 0;
 }
-...
+// ...
 ```
 다음번에 제거 될 최상단 노드의 데이터를 조회하는 함수와 스택 내 데이터를 모두 삭제하는 함수를 작성한다.
 
 ```c#
-...
+// ...
 public T[] ToArray()
 {
   T[] newArray = new T[Count];
@@ -1754,13 +1754,13 @@ public T[] ToArray()
   }
   return newArray;
 }
-...
+// ...
 ```
 현재 스택을 배열로 변화 후 반환한다.  
 새 배열을 선언한 뒤 현재 객체를 foreach로 반복하여 배열에 값을 추가한 후 배열을 반환한다.
 
 ```c#
-...
+// ...
 public void CopyTo(T[] array, int arrayIndex)
 {
   foreach (T t in this)
@@ -1769,7 +1769,7 @@ public void CopyTo(T[] array, int arrayIndex)
     arrayIndex++;
   }
 }
-...
+// ...
 ```
 지정한 배열의 지정한 인덱스부터 스택 값을 복사한다.   
 현재 객체를 foreach로 반복하며 지정한 배열에 데이터를 추가한다.
@@ -1930,24 +1930,30 @@ public class Stack<T>
 using System;
 using System.Collections;
 
+// 노드 클래스
 public class Node<T>
 {
+  // 노드의 값, 다음 노드, 이전 노드
   public T Data { get; set; }
   public Node<T> NextNode { get; set; }
   public Node<T> PrevNode { get; set; }
 
+  // 생성자
   public Node(T data)
   {
     Data = data;
   }
 }
 
+// 큐 클래스
 public class Queue<T>
 {
+  // 최상단 노드, 최하단 노드, 큐 크기
   private Node<T> Head { get; set; }
   private Node<T> Tail { get; set; }
   public int Count { get; set; }
 
+  // 기본 생성자
   public Queue()
   {
     Head = null;
@@ -1955,6 +1961,7 @@ public class Queue<T>
     Count = 0;
   }
 
+  // Enumerable 객체를 스택으로 변환하는 생성자
   public Queue(IEnumerable<T> items) : this()
   {
     foreach (var item in items)
@@ -1963,6 +1970,7 @@ public class Queue<T>
     }
   }
 
+  // IEnumerator 구현
   public IEnumerator GetEnumerator()
   {
     Node<T> currNode = Head;
@@ -1973,17 +1981,36 @@ public class Queue<T>
     }
   }
 
+  // 큐가 비어 있는지 확인
+  private bool IsEmpty()
+  {
+    // 최상단, 최하단 노드가 존재하지 않거나 크기가 0일시 true 반환
+    if (Head == null || Tail == null || Count <= 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  // 데이터 삽입
   public void Enqueue(T data)
   {
+    // 새로운 노드 생성
     Node<T> newNode = new Node<T>(data);
 
+    // 큐가 비어 있을 경우 실행
     if (IsEmpty())
     {
+      // 새 노드는 최상단, 최하단 노드가 됨
       Head = newNode;
       Tail = newNode;
     }
     else
     {
+      // 새 노드와 현재 최하단 노드를 교체
       Tail.NextNode = newNode;
       newNode.PrevNode = Tail;
       Tail = newNode;
@@ -1992,32 +2019,63 @@ public class Queue<T>
     Count++;
   }
 
+  // 데이터 제거
   public T Dequeue()
   {
-    T data = Head.Data;
-    Head = Head.NextNode;
-    Head.PrevNode = null;
+    // 큐에 데이터가 1개라도 있을 경우 실행
+    if (Count > 0)
+    {
+      // 최상단 노드 데이터 저장
+      T data = Head.Data;
 
-    Count--;
-    return data;
+      // 큐에 데이터가 1개일 경우 실행
+      if (Count == 1)
+      {
+        // 큐 내부 정리
+        Clear();
+      }
+      else
+      {
+        // 최상단 노드와 다음 노드를 교체
+        Head = Head.NextNode;
+        Head.PrevNode = null;
+        Count--;
+      }
+      return data;
+    }
+    return default(T);
   }
 
+  // 다음 제거될 데이터 조회
   public T Peek()
   {
-    return Tail.Data;
+    // 큐가 비어 있을 경우 실행
+    if (IsEmpty())
+    {
+      return default(T);
+    }
+    else
+    {
+      return Head.Data;
+    }
   }
 
+  // 모든 데이터 삭제
   public void Clear()
   {
+    // 최상단, 최하단 노드 참조 해제 및 크기 0으로 초기화
     Head = null;
     Tail = null;
     Count = 0;
   }
 
+  // 큐를 배열로 전환
   public T[] ToArray()
   {
+    // 새 배열 생성
     T[] newArray = new T[Count];
 
+    // 배열에 큐 데이터 추가
     int i = 0;
     foreach (T t in this)
     {
@@ -2027,24 +2085,14 @@ public class Queue<T>
     return newArray;
   }
 
+  // 배열에 큐 복사
   public void CopyTo(T[] array, int arrayIndex)
   {
+    // 지정한 인덱스부터 배열에 큐 데이터 추가
     foreach (T t in this)
     {
       array[arrayIndex] = t;
       arrayIndex++;
-    }
-  }
-
-  public bool IsEmpty()
-  {
-    if (Head == null || Tail == null || Count <= 0)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
     }
   }
 }
