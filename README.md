@@ -1922,6 +1922,192 @@ public class Stack<T>
 연결 리스트를 사용하면 배열에 비해 매우 쉽게 구현이 가능하다.
 
 ## 4.1. 단순 큐
+### 구현
+```c#
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+  public Node<T> PrevNode { get; set; }
+
+  public Node(T data)
+  {
+    Data = data;
+  }
+}
+```
+큐에 삽입된 데이터를 저장하고 앞뒤 노드와 연결된 노드 클래스
+
+```c#
+public class Queue<T>
+{
+  private Node<T> Head { get; set; }
+  private Node<T> Tail { get; set; }
+  public int Count { get; set; }
+  // ...
+}
+```
+큐 클래스는 데이터를 제거할 때 참조할 최상단 노드와 데이터를 삽입할 때 참조할 최하단 노드, 큐의 크기를 저장하는 필드를 가진다.
+
+```c#
+// ...
+public Queue()
+{
+  Head = null;
+  Tail = null;
+  Count = 0;
+}
+
+public Queue(IEnumerable<T> items) : this()
+{
+  foreach (var item in items)
+  {
+    Enqueue(item);
+  }
+}
+// ...
+```
+기본 생성자와 Enumerable 객체를 파라미터로 받는 생성자를 작성한다.  
+기본 생성자는 단순히 필드를 초기화한다.   
+Enumerable 객체를 받는 생성자는 기본 생성자를 상속하고, Enumerable 객체의 값을 순차적으로 큐에 삽입한다.
+
+```c#
+// ...
+public IEnumerator GetEnumerator()
+{
+  Node<T> currNode = Head;
+  while (currNode != null)
+  {
+    yield return currNode.Data;
+    currNode = currNode.NextNode;
+  }
+}
+// ...
+```
+큐 객체에 foreach문을 이용한 반복 접근을 가능하게 하기 위해 GetEnumerator 함수를 구현한다.   
+큐의 삽입, 출력 규칙에 맞춰 최상단 노드부터 삽입한 순서대로 데이터를 반환한다.
+
+```c#
+// ...
+private bool IsEmpty()
+{
+  if (Head == null || Tail == null || Count <= 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+// ...
+```
+현재 큐가 비어 있는지 확인하는 함수를 작성한다.
+
+```c#
+// ...
+public void Enqueue(T data)
+{
+  Node<T> newNode = new Node<T>(data);
+
+  if (IsEmpty())
+  {
+    Head = newNode;
+    Tail = newNode;
+  }
+  else
+  {
+    Tail.NextNode = newNode;
+    newNode.PrevNode = Tail;
+    Tail = newNode;
+  }
+
+  Count++;
+}
+// ...
+```
+큐에 데이터를 삽입하는 함수를 작성한다.   
+큐가 비어 있을 경우 새 노드는 최상단인 동시에 최하단 노드가 된다.   
+일반적인 경우엔 데이터가 삽입되는 최하단 노드와 새 노드를 연결하고, 새 노드가 최하단 노드에 위치하도록 Tail을 교체한다.
+
+```c#
+// ...
+public T Dequeue()
+{
+  if (Count > 0)
+  {
+    T data = Head.Data;
+
+    if (Count == 1)
+    {
+      Clear();
+    }
+    else
+    {
+      Head = Head.NextNode;
+      Head.PrevNode = null;
+      Count--;
+    }
+    return data;
+  }
+  return default(T);
+}
+// ...
+```
+큐에서 데이터를 제거하고 제거한 데이터를 반환하는 함수를 작성한다.  
+최상단 노드의 데이터를 저장하고 다음 노드를 최상단 노드로 교체한다.   
+만약 큐에 데이터가 1개일 경우 최상단 노드 데이터만 저장 및 반환하고 큐 내부를 정리한다.
+
+```c#
+// ...
+public T Peek()
+{
+  if (IsEmpty())
+  {
+    return default(T);
+  }
+  else
+  {
+    return Head.Data;
+  }
+}
+
+public void Clear()
+{
+  Head = null;
+  Tail = null;
+  Count = 0;
+}
+// ...
+```
+다음 제거될 데이터를 조회하는 함수와 모든 데이터를 삭제하는 함수를 작성한다.
+
+```c#
+public T[] ToArray()
+{
+  T[] newArray = new T[Count];
+
+  int i = 0;
+  foreach (T t in this)
+  {
+    newArray[i] = t;
+    i++;
+  }
+  return newArray;
+}
+
+public void CopyTo(T[] array, int arrayIndex)
+{
+  foreach (T t in this)
+  {
+    array[arrayIndex] = t;
+    arrayIndex++;
+  }
+}
+```
+큐 객체를 배열로 변환하는 함수와 큐 데이터를 배열에 복사하는 함수를 작성한다.   
+큐 인스턴스를 foreach문으로 반복 시켜 큐 데이터를 조회하는 방식을 사용한다.
+
 [파일](/sample_code/Queue.cs)
 <details>
 <summary>C# 예제 코드</summary>
@@ -2097,6 +2283,7 @@ public class Queue<T>
   }
 }
 ```
+</details>
 
 ## 4.2. 원형 큐
 큐를 위해 배열을 지정해 놓고 큐를 쓰다보면 배열의 앞부분이 비게된다는 점을 활용해서 배열의 맨 마지막 부분을 쓰면 다시 제일 처음부터 큐를 채우기 시작하는 형태의 큐이다.   
