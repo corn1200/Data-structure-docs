@@ -2303,6 +2303,173 @@ Enqueue()를 하게 되면 rear 포인터가 앞으로 이동하고, Dequeue()�
 이 그림의 Enqueue(60) 이후에는 rear 포인터가 원래의 front 포인터 자리까지 도달해 빙글빙글 돌고 있는 모습을 확인할 수 있다.  
 만약 rear 포인터가 front 포인터와 같은 위치에서 서로 만나게 된다면, 다시 말해 만나는 위치까지 이동헀다면, 그때는 정말로 여유 공간이 하나도 없다는 얘기가 되므로 공간 부족 에러를 발생시킨다.
 
+### 구현
+
+[파일](/sample_code/CircularQueue.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
+using System;
+using System.Collections;
+
+public class CircularQueue<T>
+{
+  private T[] DataArray { get; set; }
+  private int FrontIndex { get; set; }
+  private int RearIndex { get; set; }
+  private int MaxCount { get; set; }
+  public int Count { get; set; }
+
+  public CircularQueue(int length)
+  {
+    DataArray = new T[length];
+    FrontIndex = 0;
+    RearIndex = 0;
+    MaxCount = length;
+    Count = 0;
+  }
+
+  public CircularQueue(IEnumerable<T> items)
+  {
+    foreach (var item in items)
+    {
+      Enqueue(item);
+    }
+  }
+
+  public IEnumerator GetEnumerator()
+  {
+    ResetOverFrontIndex();
+    ResetOverRearIndex();
+
+    if (FrontIndex >= RearIndex)
+    {
+      for (int i = FrontIndex; i < MaxCount; i++)
+      {
+        yield return DataArray[i];
+      }
+      for (int i = 0; i < RearIndex; i++)
+      {
+        yield return DataArray[i];
+      }
+    }
+    else
+    {
+      for (int i = FrontIndex; i < RearIndex; i++)
+      {
+        yield return DataArray[i];
+      }
+    }
+  }
+
+  private void ResetOverFrontIndex()
+  {
+    if (FrontIndex == MaxCount)
+    {
+      FrontIndex = 0;
+    }
+  }
+
+  private void ResetOverRearIndex()
+  {
+    if (RearIndex == MaxCount)
+    {
+      RearIndex = 0;
+    }
+  }
+
+  public bool IsEmpty()
+  {
+    if (Count == 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public bool IsFull()
+  {
+    if (Count == MaxCount)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public void Enqueue(T data)
+  {
+    if (IsFull())
+    {
+      Console.WriteLine("CircularQueue 공간 부족");
+    }
+    else
+    {
+      ResetOverRearIndex();
+      DataArray[RearIndex] = data;
+      RearIndex++;
+      Count++;
+    }
+  }
+
+  public T Dequeue()
+  {
+    if (IsEmpty())
+    {
+      Console.WriteLine("CircularQueue 데이터 없음");
+      return default(T);
+    }
+    else
+    {
+      ResetOverFrontIndex();
+      T data = DataArray[FrontIndex];
+      DataArray[FrontIndex] = default(T);
+      FrontIndex++;
+      Count--;
+      return data;
+    }
+  }
+
+  public T Peek()
+  {
+    if (IsEmpty())
+    {
+      return default(T);
+    }
+    else
+    {
+      ResetOverFrontIndex();
+      return DataArray[FrontIndex];
+    }
+  }
+
+  public void Clear()
+  {
+    DataArray = new T[MaxCount];
+    FrontIndex = 0;
+    RearIndex = 0;
+    Count = 0;
+  }
+
+  public T[] ToArray()
+  {
+    return (T[])DataArray.Clone();
+  }
+
+  public void CopyTo(T[] array, int arrayIndex)
+  {
+    array.CopyTo(DataArray, arrayIndex);
+  }
+}
+```
+</details>
+
 ## 4.3. 덱
 ![덱](/img/deque.webp)
 
