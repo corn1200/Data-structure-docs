@@ -2723,6 +2723,249 @@ public class CircularQueue<T>
 당연히 연결 후에는 포인터를 이동하면 된다.
 
 ### 구현
+```c#
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+  public Node<T> PrevNode { get; set; }
+
+  public Node(T data)
+  {
+    Data = data;
+  }
+}
+```
+덱 데이터를 저장하고 앞뒤로 데이터를 연결할 노드 클래스를 작성한다.
+
+```c#
+public class Deque<T>
+{
+  private Node<T> Head { get; set; }
+  private Node<T> Tail { get; set; }
+  public int Count { get; set; }
+  // ...
+}
+```
+덱 클래스는 최상단, 최하단 노드와 덱 크기를 저장하는 변수를 필드로 가진다.  
+
+```c#
+// ...
+public Deque()
+{
+  Head = null;
+  Tail = null;
+  Count = 0;
+}
+
+public Deque(IEnumerable<T> items) : this()
+{
+  foreach (var item in items)
+  {
+    EnqueueTail(item);
+  }
+}
+// ...
+```
+기본 생성자와 기본 생성자를 상속 받고 Enumerable 객체를 파라미터로 받는 생성자를 작성한다.  
+기본 생성자는 덱 내 데이터를 초기화하고, Enumerable 객체를 받는 생성자는 전달 받은 데이터를 차례로 덱에 삽입한다.
+
+```c#
+// ...
+public IEnumerator GetEnumerator()
+{
+  Node<T> currNode = Head;
+  while (currNode != null)
+  {
+    yield return currNode.Data;
+    currNode = currNode.NextNode;
+  }
+}
+// ...
+```
+덱 객체가 foreach문에 사용할 수 있도록 GetEnumerator 함수를 구현한다.
+
+```c#
+// ...
+private bool IsEmpty()
+{
+  if (Head == null || Tail == null || Count <= 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+// ...
+```
+덱이 비어 있는지 확인하는 함수를 작성한다.
+
+```c#
+// ...
+public void EnqueueHead(T data)
+{
+  Node<T> newNode = new Node<T>(data);
+
+  if (IsEmpty())
+  {
+    Head = newNode;
+    Tail = newNode;
+  }
+  else
+  {
+    Head.PrevNode = newNode;
+    newNode.NextNode = Head;
+    Head = newNode;
+  }
+
+  Count++;
+}
+
+public void EnqueueTail(T data)
+{
+  Node<T> newNode = new Node<T>(data);
+
+  if (IsEmpty())
+  {
+    Head = newNode;
+    Tail = newNode;
+  }
+  else
+  {
+    Tail.NextNode = newNode;
+    newNode.PrevNode = Tail;
+    Tail = newNode;
+  }
+
+  Count++;
+}
+// ...
+```
+최상단, 최하단에 데이터를 삽입하는 함수를 작성한다.   
+두 함수 모두 덱이 비어 있을 경우 새 노드를 최상단이자 최하단 노드로 선정한다.  
+일반적인 경우엔 각각 최상단, 최하단 노드에 새 노드를 연결 후 최상단, 최하단 노드를 교체한다.
+
+```c#
+// ...
+public T DequeueHead()
+{
+  if (Count > 0)
+  {
+    T data = Head.Data;
+
+    if (Count == 1)
+    {
+      Clear();
+    }
+    else
+    {
+      Head = Head.NextNode;
+      Head.PrevNode = null;
+      Count--;
+    }
+    return data;
+  }
+  return default(T);
+}
+
+public T DequeueTail()
+{
+  if (Count > 0)
+  {
+    T data = Tail.Data;
+
+    if (Count == 1)
+    {
+      Clear();
+    }
+    else
+    {
+      Tail = Tail.PrevNode;
+      Tail.NextNode = null;
+      Count--;
+    }
+    return data;
+  }
+  return default(T);
+}
+// ...
+```
+최상단, 최하단 데이터 제거 및 반환하는 함수를 작성한다.   
+두 함수 모두 덱에 데이터가 1개 남았을 경우 내부를 초기화 후 마지막 데이터를 반환한다.   
+일반적인 경우엔 각각 최상단, 최하단 노드 데이터를 저장 후 최상단, 최하단 노드를 인접 노드로 교체한다.   
+교체된 최상단, 최하단 노드는 이전, 다음 노드 참조를 해제하고 저장한 데이터를 반환한다.
+
+```c#
+// ...
+public T PeekHead()
+{
+  if (IsEmpty())
+  {
+    Console.WriteLine("Deque에 제거할 데이터가 없음");
+    return default(T);
+  }
+  else
+  {
+    return Head.Data;
+  }
+}
+
+public T PeekTail()
+{
+  if (IsEmpty())
+  {
+    Console.WriteLine("Deque에 제거할 데이터가 없음");
+    return default(T);
+  }
+  else
+  {
+    return Tail.Data;
+  }
+}
+// ...
+```
+최상단, 최하단 데이터를 반환하는 함수를 작성한다.   
+
+```c#
+// ...
+public void Clear()
+{
+  Head = null;
+  Tail = null;
+  Count = 0;
+}
+// ...
+```
+덱 내부를 초기화하는 함수를 작성한다.
+
+```c#
+// ...
+public T[] ToArray()
+{
+  T[] newArray = new T[Count];
+
+  int i = 0;
+  foreach (T t in this)
+  {
+    newArray[i] = t;
+    i++;
+  }
+  return newArray;
+}
+
+public void CopyTo(T[] array, int arrayIndex)
+{
+  foreach (T t in this)
+  {
+    array[arrayIndex] = t;
+    arrayIndex++;
+  }
+}
+// ...
+```
+덱 데이터를 배열로 반환하는 함수와 덱 데이터를 배열에 복사하는 함수를 작성한다.
 
 [파일](/sample_code/Deque.cs)
 <details>
