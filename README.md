@@ -2304,6 +2304,212 @@ Enqueue()를 하게 되면 rear 포인터가 앞으로 이동하고, Dequeue()�
 만약 rear 포인터가 front 포인터와 같은 위치에서 서로 만나게 된다면, 다시 말해 만나는 위치까지 이동헀다면, 그때는 정말로 여유 공간이 하나도 없다는 얘기가 되므로 공간 부족 에러를 발생시킨다.
 
 ### 구현
+```c#
+public class CircularQueue<T>
+{
+  private T[] DataArray { get; set; }
+  private int FrontIndex { get; set; }
+  private int RearIndex { get; set; }
+  private int MaxCount { get; set; }
+  public int Count { get; set; }
+  // ...
+}
+```
+원형 큐는 고정 크기 배열에 데이터를 저장한다.   
+삽입, 제거 위치를 가리키는 인덱스 필드와 큐가 가질 수 있는 데이터의 총 개수, 현재 개수를 저장하는 필드를 작성한다.
+
+```c#
+// ...
+public CircularQueue(int length)
+{
+  DataArray = new T[length];
+  FrontIndex = 0;
+  RearIndex = 0;
+  MaxCount = length;
+  Count = 0;
+}
+
+public CircularQueue(IEnumerable<T> items, int length) : this(length)
+{
+  foreach (var item in items)
+  {
+    Enqueue(item);
+  }
+}
+// ...
+```
+첫 번째 생성자는 큐의 크기를 파라미터로 받고 필드를 초기화한다.   
+두 번째 생성자는 첫 번째 생성자를 상속하고 파라미터로 전달 받은 Enumerable 객체를 큐에 저장한다.
+
+```c#
+// ...
+public IEnumerator GetEnumerator()
+{
+  ResetOverFrontIndex();
+  ResetOverRearIndex();
+
+  if (FrontIndex >= RearIndex)
+  {
+    for (int i = FrontIndex; i < MaxCount; i++)
+    {
+      yield return DataArray[i];
+    }
+    for (int i = 0; i < RearIndex; i++)
+    {
+      yield return DataArray[i];
+    }
+  }
+  else
+  {
+    for (int i = FrontIndex; i < RearIndex; i++)
+    {
+      yield return DataArray[i];
+    }
+  }
+}
+// ...
+```
+GetEnumerator 함수를 구현한다.  
+만약 front나 rear 인덱스가 배열 크기보다 클 시 0으로 초기화한다.  
+front 인덱스가 rear 인덱스보다 크거나 같을 경우 front 인덱스 ~ 배열 마지막 인덱스까지 데이터 출력 후 0번 인덱스 ~ rear 인덱스까지 데이터를 출력한다.  
+그 외의 경우엔 front 인덱스 ~ rear 인덱스 데이터를 출력한다.
+
+```c#
+// ...
+private void ResetOverFrontIndex()
+{
+  if (FrontIndex == MaxCount)
+  {
+    FrontIndex = 0;
+  }
+}
+
+private void ResetOverRearIndex()
+{
+  if (RearIndex == MaxCount)
+  {
+    RearIndex = 0;
+  }
+}
+// ...
+```
+front, rear 인덱스가 배열 크기를 초과했을 경우 0으로 초기화하는 함수를 작성한다.
+
+```c#
+// ...
+public bool IsEmpty()
+{
+  if (Count == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+public bool IsFull()
+{
+  if (Count == MaxCount)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+// ...
+```
+큐가 비어있는지, 꽉 찼는지 확인하는 함수를 작성한다.
+
+```c#
+// ...
+public void Enqueue(T data)
+{
+  if (IsFull())
+  {
+    Console.WriteLine("CircularQueue 공간 부족");
+  }
+  else
+  {
+    ResetOverRearIndex();
+
+    DataArray[RearIndex] = data;
+    RearIndex++;
+    Count++;
+  }
+}
+// ...
+```
+큐에 데이터를 삽입하는 함수를 작성한다.   
+데이터를 삽입하기 전에 rear 인덱스가 배열 크기를 넘어선 위치를 가리키면 0으로 초기화한다.   
+rear 인덱스 위치에 데이터를 삽입하고 rear 인덱스를 1 이동 시킨다.
+
+```c#
+// ...
+public T Dequeue()
+{
+  if (IsEmpty())
+  {
+    Console.WriteLine("CircularQueue 데이터 없음");
+    return default(T);
+  }
+  else
+  {
+    ResetOverFrontIndex();
+
+    T data = DataArray[FrontIndex];
+    DataArray[FrontIndex] = default(T);
+    FrontIndex++;
+    Count--;
+    return data;
+  }
+}
+// ...
+```
+큐에서 데이터를 제거하고 반환하는 함수를 작성한다.  
+데이터를 제거하기 전에 front 인덱스가 배열 크기를 넘어선 위치를 가리키면 0으로 초기화한다.  
+front 인덱스 위치의 데이터를 변수에 저장하고, front 인덱스 위치의 데이터를 제거한다.  
+front 인덱스를 1 이동 시키고 저장한 변수를 반환한다.
+
+```c#
+public T Peek()
+{
+  if (IsEmpty())
+  {
+    return default(T);
+  }
+  else
+  {
+    ResetOverFrontIndex();
+    return DataArray[FrontIndex];
+  }
+}
+
+public void Clear()
+{
+  DataArray = new T[MaxCount];
+  FrontIndex = 0;
+  RearIndex = 0;
+  Count = 0;
+}
+```
+다음 제거할 데이터를 조회하는 함수와 큐 내부를 초기화하는 함수를 작성한다.
+
+```c#
+public T[] ToArray()
+{
+  return (T[])DataArray.Clone();
+}
+
+public void CopyTo(T[] array, int arrayIndex)
+{
+  array.CopyTo(DataArray, arrayIndex);
+}
+```
+큐 데이터를 배열로 반환하는 함수와 배열에 큐 데이터를 복사하는 함수를 작성한다.
 
 [파일](/sample_code/CircularQueue.cs)
 <details>
@@ -2456,7 +2662,7 @@ public class CircularQueue<T>
       // 전방 인덱스 넘쳐났을 경우 초기화
       ResetOverFrontIndex();
 
-      // 전방 인덱스 위치의 데이터를 변수에 저장 및 출력
+      // 전방 인덱스 위치의 데이터를 변수에 저장 및 반환
       // 전방 인덱스 위치에서 데이터를 제거 후 인덱스 위치 이동
       T data = DataArray[FrontIndex];
       DataArray[FrontIndex] = default(T);

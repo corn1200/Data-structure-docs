@@ -144,7 +144,7 @@ public class CircularQueue<T>
       // 전방 인덱스 넘쳐났을 경우 초기화
       ResetOverFrontIndex();
 
-      // 전방 인덱스 위치의 데이터를 변수에 저장 및 출력
+      // 전방 인덱스 위치의 데이터를 변수에 저장 및 반환
       // 전방 인덱스 위치에서 데이터를 제거 후 인덱스 위치 이동
       T data = DataArray[FrontIndex];
       DataArray[FrontIndex] = default(T);
