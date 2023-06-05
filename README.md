@@ -2475,6 +2475,7 @@ front 인덱스 위치의 데이터를 변수에 저장하고, front 인덱스 �
 front 인덱스를 1 이동 시키고 저장한 변수를 반환한다.
 
 ```c#
+// ...
 public T Peek()
 {
   if (IsEmpty())
@@ -2495,10 +2496,12 @@ public void Clear()
   RearIndex = 0;
   Count = 0;
 }
+// ...
 ```
 다음 제거할 데이터를 조회하는 함수와 큐 내부를 초기화하는 함수를 작성한다.
 
 ```c#
+// ...
 public T[] ToArray()
 {
   return (T[])DataArray.Clone();
@@ -2508,6 +2511,7 @@ public void CopyTo(T[] array, int arrayIndex)
 {
   array.CopyTo(DataArray, arrayIndex);
 }
+// ...
 ```
 큐 데이터를 배열로 반환하는 함수와 배열에 큐 데이터를 복사하는 함수를 작성한다.
 
@@ -2717,6 +2721,209 @@ public class CircularQueue<T>
 이 추상 자료형(ADT)의 구현은 배열이나 연결 리스트 모두 가능하지만, 특별히 그림과 같이 이중 연결 리스트(Doubly Linked List)로 구현하는 편이 가장 잘 어울린다.  
 이중 연결 리스트로 구현하게 되면, 그림처럼 양쪽으로 head와 tail이라는 이름의 투 포인터를 갖고 있다가 새로운 아이템이 추가될 때 마다 앞쪽 또는 뒤쪽으로 연결시켜 주기만 하면 된다.   
 당연히 연결 후에는 포인터를 이동하면 된다.
+
+### 구현
+
+[파일](/sample_code/Deque.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
+using System;
+using System.Collections;
+
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> NextNode { get; set; }
+  public Node<T> PrevNode { get; set; }
+
+  public Node(T data)
+  {
+    Data = data;
+  }
+}
+
+public class Deque<T>
+{
+  private Node<T> Head { get; set; }
+  private Node<T> Tail { get; set; }
+  public int Count { get; set; }
+
+  public Deque()
+  {
+    Head = null;
+    Tail = null;
+    Count = 0;
+  }
+
+  public Deque(IEnumerable<T> items) : this()
+  {
+    foreach (var item in items)
+    {
+      EnqueueTail(item);
+    }
+  }
+
+  public IEnumerator GetEnumerator()
+  {
+    Node<T> currNode = Head;
+    while (currNode != null)
+    {
+      yield return currNode.Data;
+      currNode = currNode.NextNode;
+    }
+  }
+
+  private bool IsEmpty()
+  {
+    if (Head == null || Tail == null || Count <= 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public void EnqueueHead(T data)
+  {
+    Node<T> newNode = new Node<T>(data);
+
+    if (IsEmpty())
+    {
+      Head = newNode;
+      Tail = newNode;
+    }
+    else
+    {
+      Head.PrevNode = newNode;
+      newNode.NextNode = Head;
+      Head = newNode;
+    }
+
+    Count++;
+  }
+
+  public void EnqueueTail(T data)
+  {
+    Node<T> newNode = new Node<T>(data);
+
+    if (IsEmpty())
+    {
+      Head = newNode;
+      Tail = newNode;
+    }
+    else
+    {
+      Tail.NextNode = newNode;
+      newNode.PrevNode = Tail;
+      Tail = newNode;
+    }
+
+    Count++;
+  }
+
+  public T DequeueHead()
+  {
+    if (Count > 0)
+    {
+      T data = Head.Data;
+
+      if (Count == 1)
+      {
+        Clear();
+      }
+      else
+      {
+        Head = Head.NextNode;
+        Head.PrevNode = null;
+        Count--;
+      }
+      return data;
+    }
+    return default(T);
+  }
+
+  public T DequeueTail()
+  {
+    if (Count > 0)
+    {
+      T data = Tail.Data;
+
+      if (Count == 1)
+      {
+        Clear();
+      }
+      else
+      {
+        Tail = Tail.PrevNode;
+        Tail.NextNode = null;
+        Count--;
+      }
+      return data;
+    }
+    return default(T);
+  }
+
+  public T PeekHead()
+  {
+    if (IsEmpty())
+    {
+      Console.WriteLine("Deque에 제거할 데이터가 없음");
+      return default(T);
+    }
+    else
+    {
+      return Head.Data;
+    }
+  }
+
+  public T PeekTail()
+  {
+    if (IsEmpty())
+    {
+      Console.WriteLine("Deque에 제거할 데이터가 없음");
+      return default(T);
+    }
+    else
+    {
+      return Tail.Data;
+    }
+  }
+
+  public void Clear()
+  {
+    Head = null;
+    Tail = null;
+    Count = 0;
+  }
+
+  public T[] ToArray()
+  {
+    T[] newArray = new T[Count];
+
+    int i = 0;
+    foreach (T t in this)
+    {
+      newArray[i] = t;
+      i++;
+    }
+    return newArray;
+  }
+
+  public void CopyTo(T[] array, int arrayIndex)
+  {
+    foreach (T t in this)
+    {
+      array[arrayIndex] = t;
+      arrayIndex++;
+    }
+  }
+}
+```
+</details>
 
 ## 4.4. 우선순위 큐
 우선순위 큐는 말 그대로 원소들에게 우선순위를 매겨서 넣을 때의 순서와 상관없이 뺄 때에는 우선순위가 높은 원소부터 빼내는 것이다.  
