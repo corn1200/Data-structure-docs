@@ -32,7 +32,7 @@ public class Queue<T>
     Count = 0;
   }
 
-  // Enumerable 객체를 스택으로 변환하는 생성자
+  // Enumerable 객체를 큐로 변환하는 생성자
   public Queue(IEnumerable<T> items) : this()
   {
     foreach (var item in items)
