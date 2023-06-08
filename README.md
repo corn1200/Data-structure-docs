@@ -3276,6 +3276,91 @@ public class Deque<T>
 2. 구현이 비교적 어렵다.
 
 ### 구현
+```c#
+public class Node<T>
+{
+  public List<Node<T>> Neighbors { get; set; }
+  public List<int> Weights { get; set; }
+  public T Data { get; set; }
+
+  public Node(T data)
+  {
+    Neighbors = new List<Node<T>>();
+    Weights = new List<int>();
+    Data = data;
+  }
+}
+```
+그래프의 노드 데이터를 저장할 클래스를 작성한다.  
+인접 노드 목록, 간선 이동 비용, 노드 데이터 필드를 가진다.
+
+```c#
+public class Graph<T>
+{
+  private List<Node<T>> NodeList { get; set; }
+
+  public Graph()
+  {
+    NodeList = new List<Node<T>>();
+  }
+  // ...
+}
+```
+그래프 자료구조를 표현할 클래스를 작성한다.   
+노드 목록 필드를 가지고, 기본 생성자로 노드 목록을 초기화한다.
+
+```c#
+// ...
+public Node<T> AddNode(T data)
+{
+  Node<T> newNode = new Node<T>(data);
+  NodeList.Add(newNode);
+  return newNode;
+}
+// ...
+```
+노드를 추가하는 함수를 작성한다.  
+새로운 노드 생성 후 그래프의 노드 목록에 추가한 후 추가한 노드를 반환한다.
+
+```c#
+// ...
+public void AddEdge(Node<T> from, Node<T> to, bool isDirected = true, int weight = 0)
+{
+  from.Neighbors.Add(to);
+  from.Weights.Add(weight);
+
+  if (!isDirected)
+  {
+    to.Neighbors.Add(from);
+    to.Weights.Add(weight);
+  }
+}
+// ...
+```
+간선을 추가하는 함수를 작성한다.  
+기본적으로 유향 그래프, 가중치 없음으로 설정한다.   
+출발 노드의 인접 노드 목록에 목표 노드를 추가하고, 간선 이동 가중치 목록에 가중치 값을 추가한다.    
+만약 무향 그래프일 경우 똑같이 목표 노드의 인접 노드 목록에 출발 노드를 추가하고, 간선 이동 가중치 목록에 가중치 값을 추가한다.
+
+```c#
+// ...
+public void WriteToString()
+{
+  foreach (Node<T> node in NodeList)
+  {
+    int i = 0;
+    foreach (var n in node.Neighbors)
+    {
+      string s = node.Data + " -> " + n.Data + " : " + node.Weights[i];
+      Console.WriteLine(s);
+      i++;
+    }
+  }
+}
+// ...
+```
+전체 노드와 노드의 간선을 출력하는 함수를 작성한다.
+
 [파일](/sample_code/Graph.cs)
 <details>
 <summary>C# 예제 코드</summary>
