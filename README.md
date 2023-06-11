@@ -3521,8 +3521,88 @@ public class Graph<T>
 * 포레스트(forest): 서로 독립인 트리들의 모임이다.
 
 ## 구현
+```c#
+public class Node<T>
+{
+  public T Data { get; set; }
+  public List<Node<T>> Children { get; set; }
 
-[파일](/sample_code/Graph.cs)
+  public Node(T data)
+  {
+    Data = data;
+    Children = new List<Node<T>>();
+  }
+}
+```
+트리 데이터 저장을 위한 노드 클래스를 작성한다.   
+노드는 자기 자신의 데이터와 자식 노드를 필드로 가진다.  
+생성자에선 데이터를 파라미터로 받고 데이터 변수와 자식 노드 리스트를 초기화한다.
+
+```c#
+public class Tree<T>
+{
+  public Node<T> Root { get; set; }
+  private string AllTreeString { get; set; }
+
+  public Tree(T data)
+  {
+    Root = new Node<T>(data);
+    AllTreeString = "";
+  }
+  // ...
+}
+```
+트리 클래스는 루트 노드와 트리 출력용 문자열 변수를 필드로 가진다.  
+생성자에선 데이터를 파라미터로 받고 루트 노드를 초기화한다.
+
+```c#
+// ...
+private void TreeToString(Node<T> parent)
+{
+  AllTreeString += $"{parent.Data}\n";
+
+  foreach (Node<T> child in parent.Children)
+  {
+    TreeToString(child);
+  }
+}
+
+public override string ToString()
+{
+  AllTreeString = "";
+  TreeToString(Root);
+  return AllTreeString;
+}
+// ...
+```
+ToString 함수를 오버라이딩해서 트리 데이터를 문자열로 반환하도록 한다.  
+TreeToString 함수는 재귀적으로 트리 노드들에 접근하여 트리 전체의 데이터를 하나의 문자열로 변환한다.
+
+```c#
+// ...
+public Node<T> Add(Node<T> parent, T data)
+{
+  Node<T> newNode = new Node<T>(data);
+  parent.Children.Add(newNode);
+  return newNode;
+}
+// ...
+```
+트리에 노드를 추가하는 함수를 작성한다.   
+새로운 노드 생성 후 부모 노드에 자식 노드로 추가한 후 추가한 노드를 참조할 수 있도록 반환한다.
+
+```c#
+// ...
+public void Remove(Node<T> parent, Node<T> child)
+{
+  parent.Children.Remove(child);
+}
+// ...
+```
+트리에서 노드를 삭제하는 함수를 작성한다.   
+부모 노드의 자식 노드 리스트에서 해당 자식 노드를 삭제한다.
+
+[파일](/sample_code/Tree.cs)
 <details>
 <summary>C# 예제 코드</summary>
 
