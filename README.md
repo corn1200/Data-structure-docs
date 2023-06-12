@@ -3722,6 +3722,230 @@ public class Tree<T>
 * Level-order: 8 3 10 1 6 14 4 7 13
 
 ## 구현
+```c#
+public class Node<T>
+{
+  public T Data { get; set; }
+  public Node<T> Left { get; set; }
+  public Node<T> Right { get; set; }
+
+  public Node(T data)
+  {
+    Data = data;
+  }
+}
+```
+이진 트리 데이터를 저장하기 위한 노드 클래스를 작성한다.  
+노드 데이터와 왼쪽, 오른쪽 노드를 필드로 가진다.
+
+```c#
+public class BinaryTree<T>
+{
+  public Node<T> Root { get; set; }
+
+  public BinaryTree(T data)
+  {
+    Root = new Node<T>(data);
+  }
+  // ...
+}
+```
+이진 트리 클래스를 작성한다.  
+루트 노드를 필드로 가지고 생성자로 루트 노드 데이터를 받아서 루트 노드를 초기화한다.
+
+```c#
+// ...
+public Node<T> AddLeft(Node<T> parent, T data)
+{
+  Node<T> newNode = new Node<T>(data);
+  parent.Left = newNode;
+  return newNode;
+}
+
+public Node<T> AddRight(Node<T> parent, T data)
+{
+  Node<T> newNode = new Node<T>(data);
+  parent.Right = newNode;
+  return newNode;
+}
+// ...
+```
+지정한 노드의 왼쪽, 오른쪽에 노드를 추가하는 함수를 작성한다.   
+파라미터로 지정한 노드와 추가할 데이터를 받는다.  
+새로운 노드 생성 후 지정한 노드의 왼쪽/오른쪽에 추가한다.   
+추가한 노드를 참조하기 위해 newNode를 반환한다.
+
+```c#
+// ...
+public void RemoveLeft(Node<T> parent)
+{
+  parent.Left = null;
+}
+
+public void RemoveRight(Node<T> parent)
+{
+  parent.Right = null;
+}
+// ...
+```
+지정한 노드의 왼쪽, 오른쪽 노드를 제거하는 함수를 작성한다.
+
+```c#
+// ...
+public void InOrderTraversal()
+{
+  Stack<Node<T>> stack = new Stack<Node<T>>();
+  HashSet<Node<T>> visited = new HashSet<Node<T>>();
+
+  stack.Push(Root);
+
+  while (stack.Count > 0)
+  {
+    Node<T> current = stack.Peek();
+    Node<T> left = current.Left;
+
+    while (left != null && !visited.Contains(left))
+    {
+      stack.Push(left);
+      left = left.Left;
+    }
+
+    Node<T> visit = stack.Pop();
+    Console.Write($"{visit.Data} ");
+    visited.Add(visit);
+
+    if (visit.Right != null)
+    {
+      stack.Push(visit.Right);
+    }
+  }
+}
+// ...
+```
+이진 트리를 왼쪽 노드, 자신, 오른쪽 노드 순서로 방문하는 중위 순회 함수를 작성한다.   
+이동 경로를 선입선출 형식으로 기록하는 스택과 방문한 노드를 저장할 해쉬테이블을 선언하고 루트 노드를 스택에 삽입한다.   
+
+1. 스택에 가장 최근 삽입된 노드와 왼쪽 노드를 저장한다.
+2. 왼쪽 노드가 없거나 이미 방문한 노드가 아닐 때 까지 왼쪽 노드로 이동하며 스택에 노드를 삽입한다.
+3. 가장 최근 삽입된 스택을 제거 및 출력한 후 방문 노드 집합에 추가한다.
+4. 오른쪽 노드가 있을 경우 스택에 노드를 삽입한다.
+
+모든 노드를 방문할 때까지 위 동작을 반복한다.
+
+```c#
+// ...
+public void PreOrderTraversal()
+{
+  Stack<Node<T>> stack = new Stack<Node<T>>();
+
+  stack.Push(Root);
+
+  while (stack.Count > 0)
+  {
+    Node<T> visit = stack.Pop();
+    Node<T> left = visit.Left;
+    Node<T> right = visit.Right;
+
+    Console.Write($"{visit.Data} ");
+
+    if (right != null)
+    {
+      stack.Push(right);
+    }
+    if (left != null)
+    {
+      stack.Push(left);
+    }
+  }
+}
+// ...
+```
+이진 트리를 자신, 왼쪽 노드, 오른쪽 노드 순서로 방문하는 전위 순회 함수를 작성한다.   
+이동 경로를 선입선출 형식으로 기록하는 스택을 선언하고 루트 노드를 스택에 삽입한다.
+
+1. 가장 최근 삽입된 스택을 제거 및 방문 노드에 저장하고 왼쪽, 오른쪽 노드를 저장한다.
+2. 방문한 노드를 출력한다.
+3. 오른쪽 노드가 있을 경우 오른쪽 노드를 스택에 삽입한다.
+4. 왼쪽 노드가 있을 경우 왼쪽 노드를 스택에 삽입한다.
+
+모든 노드를 방문할 때까지 위 동작을 반복한다.
+
+```c#
+// ...
+public void PostOrderTraversal()
+{
+  Stack<Node<T>> stack = new Stack<Node<T>>();
+  string result = "";
+
+  stack.Push(Root);
+
+  while (stack.Count > 0)
+  {
+    Node<T> visit = stack.Pop();
+    Node<T> left = visit.Left;
+    Node<T> right = visit.Right;
+
+    result = $"{visit.Data} " + result;
+
+    if (left != null)
+    {
+      stack.Push(left);
+    }
+    if (right != null)
+    {
+      stack.Push(right);
+    }
+  }
+
+  Console.Write(result);
+}
+// ...
+```
+이진 트리를 왼쪽 노드, 오른쪽 노드, 자신 순서로 방문하는 후위 순회 함수를 작성한다.   
+이동 경로를 선입선출 형식으로 기록하는 스택과 방문 노드를 저장할 문자열을 선언하고 루트 노드를 스택에 삽입한다.
+
+1. 가장 최근 삽입된 스택을 제거 및 방문 노드에 저장하고 왼쪽, 오른쪽 노드를 저장한다.
+2. 방문한 노드를 문자열에 역순으로 저장한다.
+3. 왼쪽 노드가 있을 경우 왼쪽 노드를 스택에 삽입한다.
+4. 오른쪽 노드가 있을 경우 오른쪽 노드를 스택에 삽입한다.
+
+모든 노드를 방문할 때까지 위 동작을 반복한 후 역순으로 저장된 방문 노드를 출력한다.
+
+```c#
+public void LevelOrderTraversal()
+{
+  Queue<Node<T>> queue = new Queue<Node<T>>();
+
+  queue.Enqueue(Root);
+
+  while (queue.Count > 0)
+  {
+    Node<T> visit = queue.Dequeue();
+    Node<T> left = visit.Left;
+    Node<T> right = visit.Right;
+
+    Console.Write($"{visit.Data} ");
+
+    if (left != null)
+    {
+      queue.Enqueue(left);
+    }
+    if (right != null)
+    {
+      queue.Enqueue(right);
+    }
+  }
+}
+```
+이진 트리를 레벨 순서로 방문하는 레벨 순서 순회 함수를 작성한다.  
+이동 경로를 후입선출 형식으로 기록하는 큐를 선언하고 루트 노드를 큐에 삽입한다.
+
+1. 가장 과거에 삽입된 스택을 제거 및 방문 노드에 저장하고 왼쪽, 오른쪽 노드를 저장한다.
+2. 방문한 노드를 출력한다.
+3. 왼쪽 노드가 있을 경우 왼쪽 노드를 큐에 삽입한다.
+4. 오른쪽 노드가 있을 경우 오른쪽 노드를 큐에 삽입한다.
+
+모든 노드를 방문할 때까지 위 동작을 반복한다.
 
 [파일](/sample_code/BinaryTree.cs)
 <details>
@@ -3816,7 +4040,7 @@ public class BinaryTree<T>
         left = left.Left;
       }
 
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드 출력
       Console.Write($"{visit.Data} ");
@@ -3844,7 +4068,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (stack.Count > 0)
     {
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;
@@ -3882,7 +4106,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (stack.Count > 0)
     {
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;
@@ -3921,7 +4145,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (queue.Count > 0)
     {
-      // 이동 경로 중 가장 처음 노드를 방문
+      // 이동 경로 중 가장 과거 노드를 방문
       Node<T> visit = queue.Dequeue();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;

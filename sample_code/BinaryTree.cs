@@ -86,7 +86,7 @@ public class BinaryTree<T>
         left = left.Left;
       }
 
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드 출력
       Console.Write($"{visit.Data} ");
@@ -114,7 +114,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (stack.Count > 0)
     {
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;
@@ -152,7 +152,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (stack.Count > 0)
     {
-      // 이동 경로 중 가장 마지막 노드를 방문
+      // 이동 경로 중 가장 최근 노드를 방문
       Node<T> visit = stack.Pop();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;
@@ -191,7 +191,7 @@ public class BinaryTree<T>
     // 모든 노드를 순회할 때까지 반복
     while (queue.Count > 0)
     {
-      // 이동 경로 중 가장 처음 노드를 방문
+      // 이동 경로 중 가장 과거 노드를 방문
       Node<T> visit = queue.Dequeue();
       // 방문한 노드의 왼쪽, 오른쪽 노드
       Node<T> left = visit.Left;
