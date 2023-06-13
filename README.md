@@ -4203,139 +4203,195 @@ public class BinaryTree<T>
 using System;
 using System.Collections;
 
+// 노드 클래스
 public class Node<T>
 {
+  // 노드 데이터, 왼쪽 노드, 오른쪽 노드
   public T Data { get; set; }
   public Node<T> Left { get; set; }
   public Node<T> Right { get; set; }
 
+  // 생성자
   public Node(T data)
   {
     Data = data;
   }
 }
 
+// 이진 탐색 트리 클래스
 public class BinarySearchTree<T>
 {
+  // 루트 노드, 노드 비교자
   public Node<T> Root { get; set; }
-  public Comparer<T> Comparer { get; set; }
+  private Comparer<T> Comparer { get; set; }
 
+  // 기본 생성자
   public BinarySearchTree()
   {
     Comparer = Comparer<T>.Default;
   }
 
+  // 노드 추가
   public void Add(T data)
   {
-    Node<T> node = Root;
+    // 현재 노드
+    Node<T> current = Root;
 
-    if (node == null)
+    // 현재 노드가 없을 경우 실행
+    if (current == null)
     {
+      // 새로운 노드를 루트 노드로 지정
       Root = new Node<T>(data);
     }
     else
     {
-      while (node != null)
+      // 탐색할 수 없을 때까지 반복
+      while (current != null)
       {
-        int compareResult = Comparer.Compare(node.Data, data);
+        // 비교자를 통해 현재 노드 값과 입력 값을 비교
+        int compareResult = Comparer.Compare(current.Data, data);
+
+        // 현재 노드 값과 입력 값이 동일할 경우 실행
         if (compareResult == 0)
         {
           Console.WriteLine("중복된 값 존재");
           return;
         }
+        // 입력 값이 현재 노드 값 보다 작을 경우 실행
         else if (compareResult > 0)
         {
-          if (node.Left == null)
+          // 현재 노드의 왼쪽이 비어 있을 경우 실행
+          if (current.Left == null)
           {
-            node.Left = new Node<T>(data);
+            // 현재 노드의 왼쪽에 새로운 노드 추가
+            current.Left = new Node<T>(data);
             return;
           }
-          node = node.Left;
+          // 왼쪽 노드로 이동
+          current = current.Left;
         }
+        // 입력 값이 현재 노드 값 보다 클 경우 실행
         else if (compareResult < 0)
         {
-          if (node.Right == null)
+          // 현재 노드의 오른쪽이 비어 있을 경우 실행
+          if (current.Right == null)
           {
-            node.Right = new Node<T>(data);
+            // 현재 노드의 오른쪽에 새로운 노드 추가
+            current.Right = new Node<T>(data);
             return;
           }
-          node = node.Right;
+          // 오른쪽 노드로 이동
+          current = current.Right;
         }
       }
     }
   }
 
+  // 노드 제거
   public void Remove(T data)
   {
-    Node<T> node = Root;
+    // 현재 노드
+    Node<T> current = Root;
 
-    if (Comparer.Compare(node.Data, data) == 0)
+    // 삭제할 노드가 루트인 경우 실행
+    if (Comparer.Compare(current.Data, data) == 0)
     {
+      // 루트 노드 제거
       Root = null;
     }
 
-    while (node != null)
+    // 탐색할 수 없을 때까지 반복
+    while (current != null)
     {
-      int compareResult = Comparer.Compare(node.Data, data);
+      // 비교자를 통해 현재 노드 값과 입력 값을 비교
+      int compareResult = Comparer.Compare(current.Data, data);
 
+      // 입력 값이 현재 노드 보다 작을 경우 실행
       if (compareResult > 0)
       {
-        if (node.Left == null)
+        // 왼쪽 노드가 없을 경우 실행
+        if (current.Left == null)
         {
           return;
         }
-        compareResult = Comparer.Compare(node.Left.Data, data);
+
+        // 비교자를 통해 왼쪽 노드 값과 입력 값을 비교
+        compareResult = Comparer.Compare(current.Left.Data, data);
+        // 왼쪽 노드 값과 입력 값이 동일할 경우 실행
         if (compareResult == 0)
         {
-          node.Left = null;
+          // 왼쪽 노드 제거
+          current.Left = null;
+          return;
         }
-        node = node.Left;
+        // 왼쪽 노드로 이동
+        current = current.Left;
       }
+      // 입력 값이 현재 노드 보다 클 경우 실행
       else if (compareResult < 0)
       {
-        if (node.Right == null)
+        // 오른쪽 노드가 없을 경우 실행
+        if (current.Right == null)
         {
           return;
         }
-        compareResult = Comparer.Compare(node.Right.Data, data);
+
+        // 비교자를 통해 왼쪽 노드 값과 입력 값을 비교
+        compareResult = Comparer.Compare(current.Right.Data, data);
+        // 오른쪽 노드 값과 입력 값이 동일할 경우 실행
         if (compareResult == 0)
         {
-          node.Right = null;
+          // 오른쪽 노드 제거
+          current.Right = null;
+          return;
         }
-        node = node.Right;
+        // 오른쪽 노드로 이동
+        current = current.Right;
       }
     }
   }
 
+  // 노드 검색
   public Node<T> Get(T data)
   {
-    Node<T> node = Root;
+    // 현재 노드
+    Node<T> current = Root;
 
-    while (node != null)
+    // 탐색할 수 없을 때까지 반복
+    while (current != null)
     {
-      int compareResult = Comparer.Compare(node.Data, data);
+      // 비교자를 통해 현재 노드 값과 입력 값을 비교
+      int compareResult = Comparer.Compare(current.Data, data);
 
+      // 현재 노드 값과 입력 값이 동일할 경우 실행
       if (compareResult == 0)
       {
-        return node;
+        // 현재 노드 반환
+        return current;
       }
+      // 입력 값이 현재 노드 보다 작을 경우 실행
       else if (compareResult > 0)
       {
-        node = node.Left;
+        // 왼쪽 노드로 이동
+        current = current.Left;
       }
+      // 입력 값이 현재 노드 보다 클 경우 실행
       else if (compareResult < 0)
       {
-        node = node.Right;
+        // 오른쪽 노드로 이동
+        current = current.Right;
       }
     }
 
     return null;
   }
 
+  // 노드 존재하는지 확인
   public bool Contains(T data)
   {
-    Node<T> node = Get(data);
-    return node != null;
+    // 노드 검색 후 null이 아니라면 true 반환
+    Node<T> getNode = Get(data);
+    return getNode != null;
   }
 
   // 중위 순회(In-order) 출력
