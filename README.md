@@ -4200,6 +4200,227 @@ public class BinaryTree<T>
 
 ## 구현
 ```c#
+public class Node<T>
+{
+  // ...
+}
+```
+이진 탐색 트리 데이터를 저장하기 위한 노드 클래스를 작성한다.   
+내용은 [이진 트리](#61-이진-트리)와 동일하다.
+
+```c#
+public class BinarySearchTree<T>
+{
+  public Node<T> Root { get; set; }
+  private Comparer<T> Comparer { get; set; }
+
+  public BinarySearchTree()
+  {
+    Comparer = Comparer<T>.Default;
+  }
+  // ...
+}
+```
+이진 탐색 트리 클래스를 작성한다.   
+루트 노드와 노드 값 비교를 위한 비교자를 필드로 가지고 기본 생성자로 비교자를 초기화한다.
+
+```c#
+// ...
+public void Add(T data)
+{
+  Node<T> current = Root;
+
+  if (current == null)
+  {
+    Root = new Node<T>(data);
+  }
+  else
+  {
+    while (current != null)
+    {
+      int compareResult = Comparer.Compare(current.Data, data);
+
+      if (compareResult == 0)
+      {
+        Console.WriteLine("중복된 값 존재");
+        return;
+      }
+      else if (compareResult > 0)
+      {
+        if (current.Left == null)
+        {
+          current.Left = new Node<T>(data);
+          return;
+        }
+        current = current.Left;
+      }
+      else if (compareResult < 0)
+      {
+        if (current.Right == null)
+        {
+          current.Right = new Node<T>(data);
+          return;
+        }
+        current = current.Right;
+      }
+    }
+  }
+}
+// ...
+```
+노드를 추가하는 함수를 작성한다.  
+루트 노드가 없을 경우 새로운 노드를 루트 노드로 지정한다.   
+그 외의 경우엔,
+
+1. 비교자를 통해 현재 노드 값과 입력 값을 비교
+2. 현재 노드 값과 입력 값이 동일한 경우 노드 추가하지 않고 함수 종료(이진 탐색 트리는 중복값을 취급하지 않는다.)
+3. 입력 값이 현재 노드 값 보다 작고 왼쪽이 비어 있을 경우 현재 노드 왼쪽에 새로운 노드를 추가한다.  
+왼쪽 노드가 존재할 경우 왼쪽 노드로 이동한다.
+4. 입력 값이 현재 노드 값 보다 크고 오른쪽이 비어 있을 경우 현재 노드 오른쪽에 새로운 노드를 추가한다.  
+오른쪽 노드가 존재할 경우 오른쪽 노드로 이동한다.
+
+위 동작을 더 이상 탐색할 수 없을 때까지 반복한다.
+
+```c#
+// ...
+public void Remove(T data)
+{
+  Node<T> current = Root;
+
+  if (Comparer.Compare(current.Data, data) == 0)
+  {
+    Root = null;
+  }
+
+  while (current != null)
+  {
+    int compareResult = Comparer.Compare(current.Data, data);
+
+    if (compareResult > 0)
+    {
+      if (current.Left == null)
+      {
+        return;
+      }
+
+      compareResult = Comparer.Compare(current.Left.Data, data);
+      if (compareResult == 0)
+      {
+        current.Left = null;
+        return;
+      }
+      current = current.Left;
+    }
+    else if (compareResult < 0)
+    {
+      if (current.Right == null)
+      {
+        return;
+      }
+
+      compareResult = Comparer.Compare(current.Right.Data, data);
+      if (compareResult == 0)
+      {
+        current.Right = null;
+        return;
+      }
+      current = current.Right;
+    }
+  }
+}
+// ...
+```
+노드를 제거하는 함수를 작성한다.  
+제거하고자 하는 노드가 루트 노드일 경우 루트 노드를 null로 초기화한다.  
+그 외의 경우엔,
+
+1. 비교자를 통해 현재 노드 값과 입력 값을 비교
+2. 입력 값이 현재 노드 값 보다 작고 왼쪽이 비어 있을 경우 함수 실행을 종료한다.   
+왼쪽 노드가 존재할 경우 비교자를 통해 왼쪽 노드 값과 입력 값이 동일한지 확인한다.   
+동일한 경우 왼쪽 노드를 제거하고 아닐 경우 왼쪽 노드로 이동한다.
+3. 입력 값이 현재 노드 값 보다 크고 오른쪽이 비어 있을 경우 함수 실행을 종료한다.   
+오른쪽 노드가 존재할 경우 비교자를 통해 오른쪽 노드 값과 입력 값이 동일한지 확인한다.   
+동일한 경우 오른쪽 노드를 제거하고 아닐 경우 오른쪽 노드로 이동한다.
+
+위 동작을 더 이상 탐색할 수 없을 때까지 반복한다.
+
+```c#
+// ...
+public Node<T> Get(T data)
+{
+  Node<T> current = Root;
+
+  while (current != null)
+  {
+    int compareResult = Comparer.Compare(current.Data, data);
+
+    if (compareResult == 0)
+    {
+      return current;
+    }
+    else if (compareResult > 0)
+    {
+      current = current.Left;
+    }
+    else if (compareResult < 0)
+    {
+      current = current.Right;
+    }
+  }
+
+  return null;
+}
+
+public bool Contains(T data)
+{
+  Node<T> getNode = Get(data);
+  return getNode != null;
+}
+// ...
+```
+노드를 검색하는 함수와 노드가 존재하는지 확인하는 함수를 작성한다.   
+노드를 검색하는 함수는
+
+1. 비교자를 통해 현재 노드 값과 입력 값을 비교
+2. 현재 노드 값과 입력 값이 동일한 경우 현재 노드를 반환한다.
+3. 입력 값이 현재 노드 값 보다 작을 경우 왼쪽 노드로 이동한다.
+4. 입력 값이 현재 노드 값 보다 클 경우 오른쪽 노드로 이동한다.
+
+위 동작을 더 이상 탐색할 수 없을 때까지 반복하고 해당하는 노드가 없을 경우 null을 반환한다.
+
+노드가 존재하는지 확인하는 함수는 노드를 검색 후 null이 아닐 경우 true를 반환한다.
+
+```c#
+// ...
+public void InOrderTraversal()
+{
+  // ...
+}
+
+public void PreOrderTraversal()
+{
+  // ...
+}
+
+public void PostOrderTraversal()
+{
+  // ...
+}
+
+public void LevelOrderTraversal()
+{
+  // ...
+}
+// ...
+```
+중위 순회, 전위 순회, 후위 순회, 레벨 순서 순회 함수를 작성한다.  
+내용은 [이진 트리](#61-이진-트리)와 동일하다.
+
+[파일](/sample_code/BinarySearchTree.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -4551,6 +4772,7 @@ public class BinarySearchTree<T>
   }
 }
 ```
+</details>
 
 # 6.1.2. AVL 트리
 ![AVL 트리](/img/AVL_tree0.svg.png)
