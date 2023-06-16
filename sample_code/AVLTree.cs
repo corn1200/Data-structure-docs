@@ -122,6 +122,7 @@ public class AVLTree<T>
     {
       // 이진 탐색 트리에선 중복 값을 취급하지 않음
       // 아무 작업도 하지 않고 현재 노드 반환
+      Console.WriteLine("중복된 값 존재");
       return node;
     }
 
@@ -129,6 +130,68 @@ public class AVLTree<T>
     node.Height = 1 + Math.Max(GetHeight(node.Left), GetHeight(node.Right));
 
     // 높이차 저장
+    int heightDifference = GetHeightDifference(node);
+
+    // LL 경우
+    if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+    {
+      // single rotation
+      return RotateRight(node);
+    }
+    // RR 경우
+    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+    {
+      // single rotation
+      return RotateLeft(node);
+    }
+    // LR 경우
+    else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+    {
+      // double rotation
+      node.Left = RotateLeft(node.Left);
+      return RotateRight(node);
+    }
+    // RL 경우
+    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+    {
+      // double rotation
+      node.Right = RotateRight(node.Right);
+      return RotateLeft(node);
+    }
+
+    return node;
+  }
+
+  private Node<T> DeleteRecursive(Node<T> node, T data)
+  {
+    if (node == null)
+    {
+      Console.WriteLine("삭제할 노드가 없음");
+      return null;
+    }
+
+    if (node.Left != null && Comparer.Compare(data, node.Left.Data) == 0)
+    {
+      node.Left = null;
+    }
+    else if (node.Right != null && Comparer.Compare(data, node.Right.Data) == 0)
+    {
+      node.Right = null;
+    }
+    else
+    {
+      if (Comparer.Compare(data, node.Data) < 0)
+      {
+        node.Left = DeleteRecursive(node.Left, data);
+      }
+      else if (Comparer.Compare(data, node.Data) > 0)
+      {
+        node.Right = DeleteRecursive(node.Right, data);
+      }
+    }
+
+    node.Height = 1 + Math.Max(GetHeight(node.Left), GetHeight(node.Right));
+
     int heightDifference = GetHeightDifference(node);
 
     // LL 경우
@@ -175,6 +238,61 @@ public class AVLTree<T>
       // 루트 노드를 회전 후 트리로 초기화
       Root = InsertRecursive(Root, data);
     }
+  }
+
+  public void Remove(T data)
+  {
+    if (Root == null)
+    {
+      Console.WriteLine("삭제할 노드가 없음");
+      return;
+    }
+    else
+    {
+      Root = DeleteRecursive(Root, data);
+    }
+  }
+
+  public Node<T> Get(T data)
+  {
+    // 현재 노드
+    Node<T> current = Root;
+
+    // 탐색할 수 없을 때까지 반복
+    while (current != null)
+    {
+      // 비교자를 통해 현재 노드 값과 입력 값을 비교
+      int compareResult = Comparer.Compare(current.Data, data);
+
+      // 현재 노드 값과 입력 값이 동일할 경우 실행
+      if (compareResult == 0)
+      {
+        // 현재 노드 반환
+        return current;
+      }
+      // 입력 값이 현재 노드 보다 작을 경우 실행
+      else if (compareResult > 0)
+      {
+        // 왼쪽 노드로 이동
+        current = current.Left;
+      }
+      // 입력 값이 현재 노드 보다 클 경우 실행
+      else if (compareResult < 0)
+      {
+        // 오른쪽 노드로 이동
+        current = current.Right;
+      }
+    }
+
+    return null;
+  }
+
+  // 노드 존재하는지 확인
+  public bool Contains(T data)
+  {
+    // 노드 검색 후 null이 아니라면 true 반환
+    Node<T> getNode = Get(data);
+    return getNode != null;
   }
 
   // 중위 순회(In-order) 출력
