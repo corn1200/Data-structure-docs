@@ -4833,6 +4833,345 @@ d가 단말 노드가 아니라면 자신의 왼쪽 부분 트리 중에서 최�
 삭제 역시 트리가 불균형해질 수 있는데 삽입과 동일한 방법으로 d의 부모를 w라고 한 뒤 회전시켜 균형을 맞춘다.
 
 ## 구현
+```c#
+public class Node<T>
+{
+  // ...
+  public int Height { get; set; }
+  // ...
+
+  public Node(T data)
+  {
+    // ...
+    Height = 1;
+  }
+}
+```
+노드 데이터를 저장할 노드 클래스를 작성한다.  
+기존 노드 클래스에서 높이를 나타내는 필드를 추가하고 생성자에서 초기화한다.
+
+```c#
+public class AVLTree<T>
+{
+  private Node<T> Root { get; set; }
+  private Comparer<T> Comparer { get; set; }
+
+  public AVLTree()
+  {
+    Comparer = Comparer<T>.Default;
+  }
+  // ...
+}
+```
+AVL 트리 클래스를 작성한다.   
+루트 노드와 비교자를 필드로 가지고 생성자에서 비교자를 초기화한다.
+
+```c#
+// ...
+private int GetHeight(Node<T> node)
+{
+  if (node == null)
+  {
+    return 0;
+  }
+  return node.Height;
+}
+
+private int GetHeightDifference(Node<T> node)
+{
+  if (node == null)
+  {
+    return 0;
+  }
+  return GetHeight(node.Left) - GetHeight(node.Right);
+}
+// ...
+```
+노드의 높이를 반환하는 함수와 노드 좌우 자식의 높이차를 반환하는 함수를 작성한다.   
+두 함수 모두 노드가 유효하지 않은 경우 0을 반환한다.
+
+```c#
+// ...
+private Node<T> RotateRight(Node<T> c)
+{
+  Node<T> b = c.Left;
+  Node<T> t2 = b.Right;
+
+  b.Right = c;
+  c.Left = t2;
+
+  c.Height = Math.Max(GetHeight(c.Left),
+      GetHeight(c.Right)) + 1;
+  b.Height = Math.Max(GetHeight(b.Left),
+      GetHeight(b.Right)) + 1;
+
+  return b;
+}
+
+private Node<T> RotateLeft(Node<T> a)
+{
+  Node<T> b = a.Right;
+  Node<T> t1 = b.Left;
+
+  b.Left = a;
+  a.Right = t1;
+
+  a.Height = Math.Max(GetHeight(a.Left),
+      GetHeight(a.Right)) + 1;
+  b.Height = Math.Max(GetHeight(b.Left), 
+      GetHeight(b.Right)) + 1;
+
+  return b;
+}
+// ...
+```
+노드를 오른쪽, 왼쪽으로 회전하는 함수를 작성한다.   
+회전의 기준이 되는 세 노드 x, y, z를 in-order로 나열한 a, b, c를 선언한다.  
+a, b, c의 부분 트리를 in-order로 나열한 T0, T1, T2, T3를 선언한다.  
+z가 루트인 부분 트리를 b를 루트로 하는 새로운 부분 트리로 변경한다.   
+a가 b의 왼쪽 자식이 되고, c가 b의 오른쪽 자식이 된다.   
+T0, T1은 각각 a의 왼쪽, 오른쪽 자식이 되고 T2, T3은 각각 c의 왼쪽, 오른쪽 자식이 된다.  
+위치=레벨이 변경된 노드들의 높이를 업데이트하고 위치=루트가 변경된 트리를 반환한다.   
+회전 중 유실되지 않거나 이동할 필요가 없는 노드, 부분 트리의 저장 및 위치 변경은 생략한다.
+
+```c#
+// ...
+private Node<T> InsertRecursive(Node<T> node, T data)
+{
+  if (node == null)
+  {
+    return new Node<T>(data);
+  }
+
+  if (Comparer.Compare(data, node.Data) < 0)
+  {
+    node.Left = InsertRecursive(node.Left, data);
+  }
+  else if (Comparer.Compare(data, node.Data) > 0)
+  {
+    node.Right = InsertRecursive(node.Right, data);
+  }
+  else
+  {
+    Console.WriteLine("중복된 값 존재");
+    return node;
+  }
+
+  node.Height = 1 + Math.Max(GetHeight(node.Left), GetHeight(node.Right));
+
+  int heightDifference = GetHeightDifference(node);
+
+  if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+  {
+    return RotateRight(node);
+  }
+  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+  {
+    return RotateLeft(node);
+  }
+  else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+  {
+    node.Left = RotateLeft(node.Left);
+    return RotateRight(node);
+  }
+  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+  {
+    node.Right = RotateRight(node.Right);
+    return RotateLeft(node);
+  }
+
+  return node;
+}
+// ...
+```
+노드 삽입을 위해 트리를 재귀적으로 탐색하고 불균형 노드 발견 시 회전 시키는 함수를 작성한다.  
+
+1. 더 이상 탐색 가능한 노드가 없는 경우 트리에 중복 값이 없고 입력 값이 삽입되어야 할 유효한 위치에 도달했다고 판단하여 새로운 노드를 생성하고 반환한다.  
+2. 입력 값이 현재 노드 값보다 작을 경우 왼쪽 노드로 이동한다.
+3. 입력 값이 현재 노드 값보다 클 경우 오른쪽 노드로 이동한다.
+4. 입력 값과 중복된 값이 존재할 경우 아무 동작도 하지 않고 현재 노드를 반환한다.
+
+새로운 노드를 삽입하거나, 중복된 값이 존재할 경우 탐색을 종료하고 이동 경로를 되짚으며 아래 동작을 수행한다.  
+
+1. 현재 노드의 높이를 수정한다.
+2. 자식의 높이차를 계산하여 현재 노드가 불균형 노드 z인지 확인한다.   
+회전의 기준이 되는 세 노드 x, y, z는 아래와 같이 선정한다.  
+z: 루트로 가는 경로상에 가장 처음 위치한 불균형 노드  
+y: z의 자식 중 가장 큰 높이를 갖는 노드   
+x: y의 자식 중 가장 큰 높이를 갖는 노드
+3. x, y, z의 불균형 배치를 네 가지 경우로 나눈다.   
+3.1. Left-Left case: y가 z의 왼쪽 노드, x가 y의 왼쪽 노드일 경우  
+z를 y의 오른쪽으로 회전 시킨 트리를 반환한다.   
+3.2. Right-Right case: y가 z의 오른쪽 노드, x가 y의 오른쪽 노드일 경우  
+z를 y의 왼쪽으로 회전 시킨 트리를 반환한다.   
+3.3. Left-Right case: y가 z의 왼쪽 노드, x가 y의 오른쪽 노드일 경우   
+왼쪽 노드=y를 y를 x의 왼쪽으로 회전 시킨 트리로 초기화하면 x, y, z의 배치가 Left-Left case가 된다.   
+z를 y의 오른쪽으로 회전 시킨 트리를 반환한다.   
+3.4. Right-Left case: y가 z의 오른쪽 노드, x가 y의 왼쪽 노드일 경우   
+오른쪽 노드=y를 y를 x의 오른쪽으로 회전 시킨 트리로 초기화하면 x, y, z의 배치가 Right-Right case가 된다.  
+z를 y의 왼쪽으로 회전 시킨 트리를 반환한다.
+4. 회전이 필요하지 않은 경우 아무 작업도 하지 않고 현재 노드를 반환한다.
+
+```c#
+// ...
+private Node<T> DeleteRecursive(Node<T> node, T data)
+{
+  if (node == null)
+  {
+    Console.WriteLine("삭제할 노드가 없음");
+    return null;
+  }
+
+  if (node.Left != null && Comparer.Compare(data, node.Left.Data) == 0)
+  {
+    node.Left = null;
+  }
+  else if (node.Right != null && Comparer.Compare(data, node.Right.Data) == 0)
+  {
+    node.Right = null;
+  }
+  else
+  {
+    if (Comparer.Compare(data, node.Data) < 0)
+    {
+      node.Left = DeleteRecursive(node.Left, data);
+    }
+    else if (Comparer.Compare(data, node.Data) > 0)
+    {
+      node.Right = DeleteRecursive(node.Right, data);
+    }
+  }
+
+  node.Height = 1 + Math.Max(GetHeight(node.Left), GetHeight(node.Right));
+
+  int heightDifference = GetHeightDifference(node);
+
+  if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+  {
+    return RotateRight(node);
+  }
+  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+  {
+    return RotateLeft(node);
+  }
+  else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+  {
+    node.Left = RotateLeft(node.Left);
+    return RotateRight(node);
+  }
+  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+  {
+    node.Right = RotateRight(node.Right);
+    return RotateLeft(node);
+  }
+
+  return node;
+}
+// ...
+```
+노드 제거를 위해 트리를 재귀적으로 탐색하고 불균형 노드 발견 시 회전 시키는 함수를 작성한다.  
+
+1. 더 이상 탐색 가능한 노드가 없는 경우 트리에 삭제할 값이 없다고 출력한다.
+2. 현재 노드의 왼쪽 혹은 오른쪽 자식이 삭제할 노드일 경우 자식 삭제한다.
+3. 현재 노드의 자식 중에 삭제할 노드가 없을 경우 왼쪽 혹은 오른쪽 노드로 이동한다.
+
+노드를 삭제하거나, 삭제할 노드가 없는 경우 탐색을 종료하고 이동 경로를 되짚으며 아래 동작을 수행한다.
+
+1. 현재 노드의 높이를 수정한다.
+2. 자식의 높이차를 계산하여 현재 노드가 불균형 노드 z인지 확인한다.   
+회전의 기준이 되는 세 노드 x, y, z는 아래와 같이 선정한다.  
+z: 루트로 가는 경로상에 가장 처음 위치한 불균형 노드  
+y: z의 자식 중 가장 큰 높이를 갖는 노드   
+x: y의 자식 중 가장 큰 높이를 갖는 노드
+3. x, y, z의 불균형 배치를 네 가지 경우로 나눈다.   
+3.1. Left-Left case: y가 z의 왼쪽 노드, x가 y의 왼쪽 노드일 경우  
+z를 y의 오른쪽으로 회전 시킨 트리를 반환한다.   
+3.2. Right-Right case: y가 z의 오른쪽 노드, x가 y의 오른쪽 노드일 경우  
+z를 y의 왼쪽으로 회전 시킨 트리를 반환한다.   
+3.3. Left-Right case: y가 z의 왼쪽 노드, x가 y의 오른쪽 노드일 경우   
+왼쪽 노드=y를 y를 x의 왼쪽으로 회전 시킨 트리로 초기화하면 x, y, z의 배치가 Left-Left case가 된다.  
+z를 y의 오른쪽으로 회전 시킨 트리를 반환한다.   
+3.4. Right-Left case: y가 z의 오른쪽 노드, x가 y의 왼쪽 노드일 경우   
+오른쪽 노드=y를 y를 x의 오른쪽으로 회전 시킨 트리로 초기화하면 x, y, z의 배치가 Right-Right case가 된다.  
+z를 y의 왼쪽으로 회전 시킨 트리를 반환한다.   
+4. 회전이 필요하지 않은 경우 아무 작업도 하지 않고 현재 노드를 반환한다.
+
+```c#
+// ...
+public void Add(T data)
+{
+  if (Root == null)
+  {
+    Root = new Node<T>(data);
+  }
+  else
+  {
+    Root = InsertRecursive(Root, data);
+  }
+}
+
+public void Remove(T data)
+{
+  if (Root == null)
+  {
+    Console.WriteLine("삭제할 노드가 없음");
+    return;
+  }
+  else
+  {
+    Root = DeleteRecursive(Root, data);
+  }
+}
+// ...
+```
+노드 삽입하는 함수와 제거하는 함수를 작성한다.  
+각각 루트가 없을 시 예외처리하고 재귀적으로 트리를 탐색한 후 루트를 불균형 노드가 수정된 트리로 초기화한다.
+
+```c#
+// ...
+public Node<T> Get(T data)
+{
+  // ...
+}
+
+public bool Contains(T data)
+{
+  // ...
+}
+// ...
+```
+노드를 검색하는 함수와 노드 존재 여부를 반환하는 함수를 작성한다.   
+내용은 [이진 트리](#61-이진-트리)와 동일하다.
+
+```c#
+// ...
+public void InOrderTraversal()
+{
+  // ...
+}
+
+public void PreOrderTraversal()
+{
+  // ...
+}
+
+public void PostOrderTraversal()
+{
+  // ...
+}
+
+public void LevelOrderTraversal()
+{
+  // ...
+}
+// ...
+```
+중위 순회, 전위 순회, 후위 순회, 레벨 순서 순회 함수를 작성한다.  
+내용은 [이진 트리](#61-이진-트리)와 동일하다.
+
+[파일](/sample_code/AVLTree.cs)
+<details>
+<summary>C# 예제 코드</summary>
 
 ```c#
 using System;
@@ -4892,7 +5231,7 @@ public class AVLTree<T>
     return GetHeight(node.Left) - GetHeight(node.Right);
   }
 
-  // 왼쪽 노드를 오른쪽으로 회전
+  // 노드를 오른쪽으로 회전
   private Node<T> RotateRight(Node<T> c)
   {
     // 회전의 기준이 되는 세 노드 x, y, z를 in-order로 나열한 a, b, c
@@ -4921,7 +5260,7 @@ public class AVLTree<T>
     return b;
   }
 
-  // 오른쪽 노드를 왼쪽으로 회전
+  // 노드를 왼쪽으로 회전
   private Node<T> RotateLeft(Node<T> a)
   {
     // 회전의 기준이 되는 세 노드 x, y, z를 in-order로 나열한 a, b, c
@@ -4943,7 +5282,8 @@ public class AVLTree<T>
     // 위치=레벨 변경된 노드들의 높이 업데이트
     a.Height = Math.Max(GetHeight(a.Left),
         GetHeight(a.Right)) + 1;
-    b.Height = Math.Max(GetHeight(b.Left), GetHeight(b.Right)) + 1;
+    b.Height = Math.Max(GetHeight(b.Left), 
+        GetHeight(b.Right)) + 1;
 
     // 위치=루트 변경된 트리 반환
     return b;
@@ -5348,6 +5688,7 @@ public class AVLTree<T>
   }
 }
 ```
+</details>
 
 # 6.1.3. 레드-블랙 트리
 ![레드-블랙 트리](/img/Red-black_tree0.svg.png)

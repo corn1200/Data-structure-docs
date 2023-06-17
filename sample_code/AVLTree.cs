@@ -55,7 +55,7 @@ public class AVLTree<T>
     return GetHeight(node.Left) - GetHeight(node.Right);
   }
 
-  // 왼쪽 노드를 오른쪽으로 회전
+  // 노드를 오른쪽으로 회전
   private Node<T> RotateRight(Node<T> c)
   {
     // 회전의 기준이 되는 세 노드 x, y, z를 in-order로 나열한 a, b, c
@@ -84,7 +84,7 @@ public class AVLTree<T>
     return b;
   }
 
-  // 오른쪽 노드를 왼쪽으로 회전
+  // 노드를 왼쪽으로 회전
   private Node<T> RotateLeft(Node<T> a)
   {
     // 회전의 기준이 되는 세 노드 x, y, z를 in-order로 나열한 a, b, c
@@ -106,7 +106,8 @@ public class AVLTree<T>
     // 위치=레벨 변경된 노드들의 높이 업데이트
     a.Height = Math.Max(GetHeight(a.Left),
         GetHeight(a.Right)) + 1;
-    b.Height = Math.Max(GetHeight(b.Left), GetHeight(b.Right)) + 1;
+    b.Height = Math.Max(GetHeight(b.Left), 
+        GetHeight(b.Right)) + 1;
 
     // 위치=루트 변경된 트리 반환
     return b;
