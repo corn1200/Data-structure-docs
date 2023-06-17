@@ -4855,6 +4855,7 @@ public class AVLTree<T>
 {
   private Node<T> Root { get; set; }
   private Comparer<T> Comparer { get; set; }
+  private T TempInputData { get; set; }
 
   public AVLTree()
   {
@@ -4864,7 +4865,7 @@ public class AVLTree<T>
 }
 ```
 AVL 트리 클래스를 작성한다.   
-루트 노드와 비교자를 필드로 가지고 생성자에서 비교자를 초기화한다.
+루트 노드와 비교자, 입력값 임시 저장 변수를 필드로 가지고 생성자에서 비교자를 초기화한다.
 
 ```c#
 // ...
@@ -4936,20 +4937,20 @@ T0, T1은 각각 a의 왼쪽, 오른쪽 자식이 되고 T2, T3은 각각 c의 �
 
 ```c#
 // ...
-private Node<T> InsertRecursive(Node<T> node, T data)
+private Node<T> InsertRecursive(Node<T> node)
 {
   if (node == null)
   {
-    return new Node<T>(data);
+    return new Node<T>(TempInputData);
   }
 
-  if (Comparer.Compare(data, node.Data) < 0)
+  if (Comparer.Compare(TempInputData, node.Data) < 0)
   {
-    node.Left = InsertRecursive(node.Left, data);
+    node.Left = InsertRecursive(node.Left);
   }
-  else if (Comparer.Compare(data, node.Data) > 0)
+  else if (Comparer.Compare(TempInputData, node.Data) > 0)
   {
-    node.Right = InsertRecursive(node.Right, data);
+    node.Right = InsertRecursive(node.Right);
   }
   else
   {
@@ -4961,20 +4962,20 @@ private Node<T> InsertRecursive(Node<T> node, T data)
 
   int heightDifference = GetHeightDifference(node);
 
-  if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+  if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) < 0)
   {
     return RotateRight(node);
   }
-  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+  else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) > 0)
   {
     return RotateLeft(node);
   }
-  else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+  else if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) > 0)
   {
     node.Left = RotateLeft(node.Left);
     return RotateRight(node);
   }
-  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+  else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) < 0)
   {
     node.Right = RotateRight(node.Right);
     return RotateLeft(node);
@@ -5014,7 +5015,7 @@ z를 y의 왼쪽으로 회전 시킨 트리를 반환한다.
 
 ```c#
 // ...
-private Node<T> DeleteRecursive(Node<T> node, T data)
+private Node<T> DeleteRecursive(Node<T> node)
 {
   if (node == null)
   {
@@ -5022,23 +5023,23 @@ private Node<T> DeleteRecursive(Node<T> node, T data)
     return null;
   }
 
-  if (node.Left != null && Comparer.Compare(data, node.Left.Data) == 0)
+  if (node.Left != null && Comparer.Compare(TempInputData, node.Left.Data) == 0)
   {
     node.Left = null;
   }
-  else if (node.Right != null && Comparer.Compare(data, node.Right.Data) == 0)
+  else if (node.Right != null && Comparer.Compare(TempInputData, node.Right.Data) == 0)
   {
     node.Right = null;
   }
   else
   {
-    if (Comparer.Compare(data, node.Data) < 0)
+    if (Comparer.Compare(TempInputData, node.Data) < 0)
     {
-      node.Left = DeleteRecursive(node.Left, data);
+      node.Left = DeleteRecursive(node.Left);
     }
-    else if (Comparer.Compare(data, node.Data) > 0)
+    else if (Comparer.Compare(TempInputData, node.Data) > 0)
     {
-      node.Right = DeleteRecursive(node.Right, data);
+      node.Right = DeleteRecursive(node.Right);
     }
   }
 
@@ -5046,20 +5047,20 @@ private Node<T> DeleteRecursive(Node<T> node, T data)
 
   int heightDifference = GetHeightDifference(node);
 
-  if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+  if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) < 0)
   {
     return RotateRight(node);
   }
-  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+  else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) > 0)
   {
     return RotateLeft(node);
   }
-  else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+  else if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) > 0)
   {
     node.Left = RotateLeft(node.Left);
     return RotateRight(node);
   }
-  else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+  else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) < 0)
   {
     node.Right = RotateRight(node.Right);
     return RotateLeft(node);
@@ -5106,7 +5107,9 @@ public void Add(T data)
   }
   else
   {
-    Root = InsertRecursive(Root, data);
+    TempInputData = data;
+    Root = InsertRecursive(Root);
+    TempInputData = default;
   }
 }
 
@@ -5119,7 +5122,9 @@ public void Remove(T data)
   }
   else
   {
-    Root = DeleteRecursive(Root, data);
+    TempInputData = data;
+    Root = DeleteRecursive(Root);
+    TempInputData = default;
   }
 }
 // ...
@@ -5201,6 +5206,7 @@ public class AVLTree<T>
   // 루트 노드, 비교자
   private Node<T> Root { get; set; }
   private Comparer<T> Comparer { get; set; }
+  private T TempInputData { get; set; }
 
   // 기본 생성자
   public AVLTree()
@@ -5282,7 +5288,7 @@ public class AVLTree<T>
     // 위치=레벨 변경된 노드들의 높이 업데이트
     a.Height = Math.Max(GetHeight(a.Left),
         GetHeight(a.Right)) + 1;
-    b.Height = Math.Max(GetHeight(b.Left), 
+    b.Height = Math.Max(GetHeight(b.Left),
         GetHeight(b.Right)) + 1;
 
     // 위치=루트 변경된 트리 반환
@@ -5290,26 +5296,26 @@ public class AVLTree<T>
   }
 
   // 노드 삽입을 위한 재귀적 탐색 및 회전
-  private Node<T> InsertRecursive(Node<T> node, T data)
+  private Node<T> InsertRecursive(Node<T> node)
   {
     // 노드가 유효하지 않을 경우 실행
     if (node == null)
     {
       // 더 이상 탐색 가능한 노드가 없는 경우 새로운 노드 선언 및 반환
-      return new Node<T>(data);
+      return new Node<T>(TempInputData);
     }
 
     // 입력 값이 현재 노드 값보다 작을 경우 실행
-    if (Comparer.Compare(data, node.Data) < 0)
+    if (Comparer.Compare(TempInputData, node.Data) < 0)
     {
       // 왼쪽 노드로 이동 후 회전된 트리로 초기화
-      node.Left = InsertRecursive(node.Left, data);
+      node.Left = InsertRecursive(node.Left);
     }
     // 입력 값이 현재 노드 값보다 클 경우 실행
-    else if (Comparer.Compare(data, node.Data) > 0)
+    else if (Comparer.Compare(TempInputData, node.Data) > 0)
     {
       // 오른쪽 노드로 이동 후 회전된 트리로 초기화
-      node.Right = InsertRecursive(node.Right, data);
+      node.Right = InsertRecursive(node.Right);
     }
     // 입력 값이 현재 노드 값과 같을 경우 실행
     else
@@ -5325,25 +5331,26 @@ public class AVLTree<T>
     // 좌우 자식의 높이차 계산
     int heightDifference = GetHeightDifference(node);
 
-    // 불균형 노드 z의 자식 중 가장 큰 높이인 y, y의 자식 중 가장 큰 높이인 x
+    // 불균형 노드 z의 자식 중 가장 높이가 큰 노드 y
+    // y의 자식 중 가장 높이가 큰 노드 x
     // x, y, z 의 불균형 배치를 네 가지 경우로 나눈다
 
     // Left-Left case: y가 z의 왼쪽 노드, x가 y의 왼쪽 노드일 경우 실행
-    if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+    if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) < 0)
     {
       // single rotation
       // z를 y의 오른쪽으로 회전 시킨 트리를 반환
       return RotateRight(node);
     }
     // Right-Right case: y가 z의 오른쪽 노드, x가 y의 오른쪽 노드일 경우 실행
-    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+    else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) > 0)
     {
       // single rotation
       // z를 y의 왼쪽으로 회전 시킨 트리를 반환
       return RotateLeft(node);
     }
     // Left-Right case: y가 z의 왼쪽 노드, x가 y의 오른쪽 노드일 경우 실행
-    else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+    else if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) > 0)
     {
       // double rotation
       // 왼쪽 노드=y를 y를 x의 왼쪽으로 회전 시킨 트리로 초기화
@@ -5353,7 +5360,7 @@ public class AVLTree<T>
       return RotateRight(node);
     }
     // Right-Left case: y가 z의 오른쪽 노드, x가 y의 왼쪽 노드일 경우 실행
-    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+    else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) < 0)
     {
       // double rotation
       // 오른쪽 노드=y를 y를 x의 오른쪽으로 회전 시킨 트리로 초기화
@@ -5368,7 +5375,7 @@ public class AVLTree<T>
   }
 
   // 노드 제거를 위한 재귀적 탐색 및 회전
-  private Node<T> DeleteRecursive(Node<T> node, T data)
+  private Node<T> DeleteRecursive(Node<T> node)
   {
     // 노드가 유효하지 않을 경우 실행
     if (node == null)
@@ -5379,13 +5386,13 @@ public class AVLTree<T>
     }
 
     // 현재 노드의 왼쪽 자식이 삭제할 노드일 경우 실행
-    if (node.Left != null && Comparer.Compare(data, node.Left.Data) == 0)
+    if (node.Left != null && Comparer.Compare(TempInputData, node.Left.Data) == 0)
     {
       // 왼쪽 자식 삭제
       node.Left = null;
     }
     // 현재 노드의 오른쪽 자식이 삭제할 노드일 경우 실행
-    else if (node.Right != null && Comparer.Compare(data, node.Right.Data) == 0)
+    else if (node.Right != null && Comparer.Compare(TempInputData, node.Right.Data) == 0)
     {
       // 오른쪽 자식 삭제
       node.Right = null;
@@ -5394,16 +5401,16 @@ public class AVLTree<T>
     else
     {
       // 입력 값이 현재 노드 값보다 작을 경우 실행
-      if (Comparer.Compare(data, node.Data) < 0)
+      if (Comparer.Compare(TempInputData, node.Data) < 0)
       {
         // 왼쪽 노드로 이동 후 회전된 트리로 초기화
-        node.Left = DeleteRecursive(node.Left, data);
+        node.Left = DeleteRecursive(node.Left);
       }
       // 입력 값이 현재 노드 값보다 클 경우 실행
-      else if (Comparer.Compare(data, node.Data) > 0)
+      else if (Comparer.Compare(TempInputData, node.Data) > 0)
       {
         // 오른쪽 노드로 이동 후 회전된 트리로 초기화
-        node.Right = DeleteRecursive(node.Right, data);
+        node.Right = DeleteRecursive(node.Right);
       }
     }
 
@@ -5413,25 +5420,26 @@ public class AVLTree<T>
     // 좌우 자식의 높이차 계산
     int heightDifference = GetHeightDifference(node);
 
-    // 불균형 노드 z의 자식 중 가장 큰 높이인 y, y의 자식 중 가장 큰 높이인 x
+    // 불균형 노드 z의 자식 중 가장 높이가 큰 노드 y
+    // y의 자식 중 가장 높이가 큰 노드 x
     // x, y, z 의 불균형 배치를 네 가지 경우로 나눈다
 
     // Left-Left case: y가 z의 왼쪽 노드, x가 y의 왼쪽 노드일 경우 실행
-    if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) < 0)
+    if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) < 0)
     {
       // single rotation
       // z를 y의 오른쪽으로 회전 시킨 트리를 반환
       return RotateRight(node);
     }
     // Right-Right case: y가 z의 오른쪽 노드, x가 y의 오른쪽 노드일 경우 실행
-    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) > 0)
+    else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) > 0)
     {
       // single rotation
       // z를 y의 왼쪽으로 회전 시킨 트리를 반환
       return RotateLeft(node);
     }
     // Left-Right case: y가 z의 왼쪽 노드, x가 y의 오른쪽 노드일 경우 실행
-    else if (heightDifference > 1 && Comparer.Compare(data, node.Left.Data) > 0)
+    else if (heightDifference > 1 && Comparer.Compare(TempInputData, node.Left.Data) > 0)
     {
       // double rotation
       // 왼쪽 노드=y를 y를 x의 왼쪽으로 회전 시킨 트리로 초기화
@@ -5441,7 +5449,7 @@ public class AVLTree<T>
       return RotateRight(node);
     }
     // Right-Left case: y가 z의 오른쪽 노드, x가 y의 왼쪽 노드일 경우 실행
-    else if (heightDifference < -1 && Comparer.Compare(data, node.Right.Data) < 0)
+    else if (heightDifference < -1 && Comparer.Compare(TempInputData, node.Right.Data) < 0)
     {
       // double rotation
       // 오른쪽 노드=y를 y를 x의 오른쪽으로 회전 시킨 트리로 초기화
@@ -5466,8 +5474,10 @@ public class AVLTree<T>
     }
     else
     {
+      TempInputData = data;
       // 루트 노드를 회전 후 트리로 초기화
-      Root = InsertRecursive(Root, data);
+      Root = InsertRecursive(Root);
+      TempInputData = default;
     }
   }
 
@@ -5483,8 +5493,10 @@ public class AVLTree<T>
     }
     else
     {
+      TempInputData = data;
       // 루트 노드를 회전 후 트리로 초기화
-      Root = DeleteRecursive(Root, data);
+      Root = DeleteRecursive(Root);
+      TempInputData = default;
     }
   }
 
