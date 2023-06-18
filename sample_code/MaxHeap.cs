@@ -75,7 +75,7 @@ public class MaxHeap<T> : Heap<T>
     }
   }
 
-  // 노드 삭제
+  // 노드 제거
   public T Remove()
   {
     // 힙에 데이터 없을 경우 실행
@@ -131,7 +131,7 @@ public class MaxHeap<T> : Heap<T>
         }
         else
         {
-          // 더 이상 자식 중 현재 노드보다 큰 값이 없을 경우 종료
+          // 더 이상 자식 중 현재 노드보다 작은 값이 없을 경우 종료
           break;
         }
       }

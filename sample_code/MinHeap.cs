@@ -75,7 +75,7 @@ public class MinHeap<T> : Heap<T>
     }
   }
 
-  // 노드 삭제
+  // 노드 제거
   public T Remove()
   {
     // 힙에 데이터 없을 경우 실행

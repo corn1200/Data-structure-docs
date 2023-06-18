@@ -5824,6 +5824,245 @@ B 트리의 확장형이다.
 물론 꼭 완전 이진 형태가 아니어도 비어 있는 위치는 얼마든지 널(Null)로 표현할 수 있기 때문에, 사실상 모든 트리는 배열로 표현이 가능하다.
 
 ## 구현
+```c#
+public interface Heap<T>
+{
+  IEnumerator GetEnumerator();
+  void Add(T data);
+  T Remove();
+}
+```
+힙 인터페이스를 작성한다.   
+해당 인터페이스를 상속한 클래스는 Enumerator, 노드 삽입/삭제하는 함수를 구현해야 한다.
+
+```c#
+public class MinHeap<T> : Heap<T>
+{
+  private List<T> Tree { get; set; }
+  private Comparer<T> Comparer { get; set; }
+
+  public MinHeap()
+  {
+    Tree = new List<T>();
+    Comparer = Comparer<T>.Default;
+  }
+
+  public IEnumerator GetEnumerator()
+  {
+    for (int i = 1; i < Tree.Count; i++)
+    {
+      yield return Tree[i];
+    }
+  }
+
+  // ...
+}
+```
+힙 인터페이스를 상속하는 최소 힙 클래스를 작성한다.   
+트리의 데이터를 담는 리스트와 비교자를 필드로 가진다.   
+생성자를 통해 트리와 비교자를 초기화하고 GetEnumerator 함수를 구현한다.
+
+```c#
+// ...
+private void Swap(int a, int b)
+{
+  T temp = Tree[a];
+  Tree[a] = Tree[b];
+  Tree[b] = temp;
+}
+// ...
+```
+두 노드의 위치를 교환하는 함수를 작성한다.
+
+```c#
+// ...
+public void Add(T data)
+{
+  if (Tree.Count == 0)
+  {
+    Tree.Add(default);
+    Tree.Add(data);
+  }
+  else
+  {
+    Tree.Add(data);
+
+    int currIndex = Tree.Count - 1;
+    int compareResult;
+
+    while (currIndex > 1)
+    {
+      int parentIndex = currIndex / 2;
+      compareResult = Comparer.Compare(data, Tree[parentIndex]);
+
+      if (compareResult < 0)
+      {
+        Swap(currIndex, parentIndex);
+        currIndex = parentIndex;
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
+}
+// ...
+```
+노드를 삽입하는 함수를 작성한다.  
+힙에 데이터가 없을 경우 1번 인덱스에 루트 노드가 될 데이터를 삽입한다.  
+일반적인 경우엔 가장 끝에 노드를 삽입하고 아래 동작을 반복한다.
+
+1. 부모 노드와 현재 노드 값을 비교한다.
+2. 현재 노드가 부모 노드보다 값이 작을 경우 두 노드 위치를 교환하고, 부모 노드 위치로 이동한다.
+3. 더 이상 부모 중 현재 노드보다 작은 값이 없을 경우 종료한다.
+
+```c#
+// ...
+public T Remove()
+{
+  if (Tree.Count == 0)
+  {
+    Console.WriteLine("힙이 비어있음.");
+    return default;
+  }
+  else
+  {
+    T rootData = Tree[1];
+
+    int maxIndex = Tree.Count - 1;
+    Tree[1] = Tree[maxIndex];
+    Tree.RemoveAt(maxIndex);
+    maxIndex = Tree.Count - 1;
+
+    int currIndex = 1;
+    int leftComparerResult;
+    int rightComparerResult;
+
+    while (currIndex < maxIndex)
+    {
+      int leftIndex = currIndex * 2;
+      int rightIndex = currIndex * 2 + 1;
+      leftComparerResult = Comparer.Compare(Tree[currIndex],
+          Tree[leftIndex]);
+      rightComparerResult = Comparer.Compare(Tree[currIndex],
+          Tree[rightIndex]);
+
+      if (leftComparerResult > 0)
+      {
+        Swap(currIndex, leftIndex);
+        currIndex = leftIndex;
+      }
+      else if (rightComparerResult > 0)
+      {
+        Swap(currIndex, rightIndex);
+        currIndex = rightIndex;
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    return rootData;
+  }
+}
+// ...
+```
+노드를 제거하는 함수를 작성한다.  
+힙에 데이터가 없을 경우 힙이 비어있다고 출력한다.   
+일반적인 경우엔 루트 노드를 저장, 마지막 노드를 루트 자리로 이동 후 아래 동작을 반복한다.
+
+1. 현재 노드가 왼쪽 자식보다 값이 작을 경우 두 노드 위치 교환하고, 왼쪽 자식 위치로 이동한다.
+2. 현재 노드가 오른쪽 자식보다 값이 작을 경우 두 노드 위치 교환하고, 오른쪽 자식 위치로 이동한다.
+3. 더 이상 자식 중 현재 노드보다 큰 값이 없을 경우 종료한다.
+
+위 동작 종료 후 제거한 루트 노드를 반환한다.
+
+```c#
+public class MaxHeap<T> : Heap<T>
+{
+  // ...
+
+  public MaxHeap()
+  {
+    // ...
+  }
+
+  // Enumerator 구현
+  public IEnumerator GetEnumerator()
+  {
+    // ...
+  }
+
+  private void Swap(int a, int b)
+  {
+    // ...
+  }
+
+  public void Add(T data)
+  {
+    if (Tree.Count == 0)
+    {
+      // ...
+    }
+    else
+    {
+      // ...
+
+      while (currIndex > 1)
+      {
+        // ...
+
+        if (compareResult > 0)
+        {
+          // ...
+        }
+        else
+        {
+          // ...
+        }
+      }
+    }
+  }
+
+  public T Remove()
+  {
+    if (Tree.Count == 0)
+    {
+      // ...
+    }
+    else
+    {
+      // ...
+
+      while (currIndex < maxIndex)
+      {
+        // ...
+        if (leftComparerResult < 0)
+        {
+          // ...
+        }
+        else if (rightComparerResult < 0)
+        {
+          // ...
+        }
+        else
+        {
+          // ...
+        }
+      }
+      // ...
+    }
+  }
+}
+```
+최대 힙 클래스는 최소 힙 클래스에서 부모 노드와 자식 노드를 교환하는 조건을 변경하여 작성한다.
+
+[파일](/sample_code/AVLTree.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
 힙 인터페이스
 ```c#
 using System;
@@ -5919,7 +6158,7 @@ public class MinHeap<T> : Heap<T>
     }
   }
 
-  // 노드 삭제
+  // 노드 제거
   public T Remove()
   {
     // 힙에 데이터 없을 경우 실행
@@ -6066,7 +6305,7 @@ public class MaxHeap<T> : Heap<T>
     }
   }
 
-  // 노드 삭제
+  // 노드 제거
   public T Remove()
   {
     // 힙에 데이터 없을 경우 실행
@@ -6122,7 +6361,7 @@ public class MaxHeap<T> : Heap<T>
         }
         else
         {
-          // 더 이상 자식 중 현재 노드보다 큰 값이 없을 경우 종료
+          // 더 이상 자식 중 현재 노드보다 작은 값이 없을 경우 종료
           break;
         }
       }
@@ -6133,3 +6372,4 @@ public class MaxHeap<T> : Heap<T>
   }
 }
 ```
+</details>
