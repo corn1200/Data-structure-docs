@@ -5822,3 +5822,237 @@ B 트리의 확장형이다.
 깊이는 1, 2, 4, 8, ... 순으로 2배씩 증가하며, 인덱스는 1부터 시작했기 때문에 부모/자식 노드의 위치는 각각 부모 ⌊i−1/2⌋, 왼쪽 자식 2i, 오른쪽 자식 2i + 1의 간단한 수식으로 계산할 수 있다.  
 이처럼 해당되는 배열의 인덱스를 금방 찾아낼 수 있다.  
 물론 꼭 완전 이진 형태가 아니어도 비어 있는 위치는 얼마든지 널(Null)로 표현할 수 있기 때문에, 사실상 모든 트리는 배열로 표현이 가능하다.
+
+## 구현
+힙 인터페이스
+```c#
+using System;
+using System.Collections;
+
+public interface Heap<T>
+{
+  IEnumerator<T> GetEnumerator();
+  void Add(T data);
+  T Remove();
+}
+```
+
+최소 힙 클래스
+```c#
+using System;
+using System.Collections;
+
+public class MinHeap<T> : Heap<T>
+{
+  private List<T> Tree { get; set; }
+  private Comparer<T> Comparer { get; set; }
+
+  public MinHeap()
+  {
+    Tree = new List<T>();
+    Comparer = Comparer<T>.Default;
+  }
+
+  public IEnumerator<T> GetEnumerator()
+  {
+    for (int i = 1; i < Tree.Count; i++)
+    {
+      yield return Tree[i];
+    }
+  }
+
+  private void Swap(int a, int b)
+  {
+    T temp = Tree[a];
+    Tree[a] = Tree[b];
+    Tree[b] = temp;
+  }
+
+  public void Add(T data)
+  {
+    if (Tree.Count == 0)
+    {
+      Tree.Add(default);
+      Tree.Add(data);
+    }
+    else
+    {
+      Tree.Add(data);
+      int currIndex = Tree.Count - 1;
+      int compareResult;
+      while (currIndex > 1)
+      {
+        int parentIndex = currIndex / 2;
+        compareResult = Comparer.Compare(data, Tree[parentIndex]);
+
+        if (compareResult < 0)
+        {
+          Swap(currIndex, parentIndex);
+          currIndex = parentIndex;
+        }
+        else
+        {
+          break;
+        }
+      }
+    }
+  }
+
+  public T Remove()
+  {
+    if (Tree.Count == 0)
+    {
+      Console.WriteLine("힙이 비어있음.");
+      return default;
+    }
+    else
+    {
+      T rootData = Tree[1];
+
+      int maxIndex = Tree.Count - 1;
+      Tree[1] = Tree[maxIndex];
+      Tree.RemoveAt(maxIndex);
+      maxIndex = Tree.Count - 1;
+
+      int currIndex = 1;
+      int leftComparerResult;
+      int rightComparerResult;
+      while (currIndex < maxIndex)
+      {
+        int leftIndex = currIndex * 2;
+        int rightIndex = currIndex * 2 + 1;
+        leftComparerResult = Comparer.Compare(Tree[currIndex],
+            Tree[leftIndex]);
+        rightComparerResult = Comparer.Compare(Tree[currIndex],
+            Tree[rightIndex]);
+        if (leftComparerResult > 0)
+        {
+          Swap(currIndex, leftIndex);
+          currIndex = leftIndex;
+        }
+        else if (rightComparerResult > 0)
+        {
+          Swap(currIndex, rightIndex);
+          currIndex = rightIndex;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      return rootData;
+    }
+  }
+}
+```
+
+최대 힙 클래스
+```c#
+using System;
+using System.Collections;
+
+public class MaxHeap<T> : Heap<T>
+{
+  private List<T> Tree { get; set; }
+  private Comparer<T> Comparer { get; set; }
+
+  public MaxHeap()
+  {
+    Tree = new List<T>();
+    Comparer = Comparer<T>.Default;
+  }
+
+  public IEnumerator<T> GetEnumerator()
+  {
+    for (int i = 1; i < Tree.Count; i++)
+    {
+      yield return Tree[i];
+    }
+  }
+
+  private void Swap(int a, int b)
+  {
+    T temp = Tree[a];
+    Tree[a] = Tree[b];
+    Tree[b] = temp;
+  }
+
+  public void Add(T data)
+  {
+    if (Tree.Count == 0)
+    {
+      Tree.Add(default);
+      Tree.Add(data);
+    }
+    else
+    {
+      Tree.Add(data);
+      int currIndex = Tree.Count - 1;
+      int compareResult;
+      while (currIndex > 1)
+      {
+        int parentIndex = currIndex / 2;
+        compareResult = Comparer.Compare(data, Tree[parentIndex]);
+
+        if (compareResult > 0)
+        {
+          Swap(currIndex, parentIndex);
+          currIndex = parentIndex;
+        }
+        else
+        {
+          break;
+        }
+      }
+    }
+  }
+
+  public T Remove()
+  {
+    if (Tree.Count == 0)
+    {
+      Console.WriteLine("힙이 비어있음.");
+      return default;
+    }
+    else
+    {
+      T rootData = Tree[1];
+
+      int maxIndex = Tree.Count - 1;
+      Tree[1] = Tree[maxIndex];
+      Tree.RemoveAt(maxIndex);
+      maxIndex = Tree.Count - 1;
+
+      int currIndex = 1;
+      int leftComparerResult;
+      int rightComparerResult;
+      while (currIndex < maxIndex)
+      {
+        int leftIndex = currIndex * 2;
+        int rightIndex = currIndex * 2 + 1;
+        leftComparerResult = Comparer.Compare(Tree[currIndex],
+            Tree[leftIndex]);
+        rightComparerResult = Comparer.Compare(Tree[currIndex],
+            Tree[rightIndex]);
+        if (leftComparerResult < 0)
+        {
+          Swap(currIndex, leftIndex);
+          currIndex = leftIndex;
+        }
+        else if (rightComparerResult < 0)
+        {
+          Swap(currIndex, rightIndex);
+          currIndex = rightIndex;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      return rootData;
+    }
+  }
+}
+```
