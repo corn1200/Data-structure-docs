@@ -5948,8 +5948,15 @@ public T Remove()
           Tree[leftIndex]) : -1;
       rightComparerResult = rightIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
           Tree[rightIndex]) : -1;
-
-      if (leftComparerResult > 0)
+      
+      if (leftComparerResult > 0 && rightComparerResult > 0)
+      {
+        int childIndex = Comparer.Compare(Tree[leftIndex],
+        Tree[rightIndex]) < 0 ? leftIndex : rightIndex;
+        Swap(currIndex, childIndex);
+        currIndex = childIndex;
+      }
+      else if (leftComparerResult > 0)
       {
         Swap(currIndex, leftIndex);
         currIndex = leftIndex;
@@ -5974,9 +5981,10 @@ public T Remove()
 힙에 데이터가 없을 경우 힙이 비어있다고 출력한다.   
 일반적인 경우엔 루트 노드를 저장, 마지막 노드를 루트 자리로 이동 후 아래 동작을 반복한다.
 
-1. 현재 노드가 왼쪽 자식보다 값이 작을 경우 두 노드 위치 교환하고, 왼쪽 자식 위치로 이동한다.
-2. 현재 노드가 오른쪽 자식보다 값이 작을 경우 두 노드 위치 교환하고, 오른쪽 자식 위치로 이동한다.
-3. 더 이상 자식 중 현재 노드보다 큰 값이 없을 경우 종료한다.
+1. 현재 노드가 왼쪽, 오른쪽 자식보다 값이 클 경우 둘 중 더 작은 쪽을 선택하여 두 노드 위치 교환하고, 선택한 자식 위치로 이동한다.
+2. 현재 노드가 왼쪽 자식보다 값이 클 경우 두 노드 위치 교환하고, 왼쪽 자식 위치로 이동한다.
+3. 현재 노드가 오른쪽 자식보다 값이 클 경우 두 노드 위치 교환하고, 오른쪽 자식 위치로 이동한다.
+4. 더 이상 자식 중 현재 노드보다 큰 값이 없을 경우 종료한다.
 
 위 동작 종료 후 제거한 루트 노드를 반환한다.
 
@@ -6198,8 +6206,19 @@ public class MinHeap<T> : Heap<T>
         rightComparerResult = rightIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
             Tree[rightIndex]) : -1;
 
+        // 현재 노드가 두 자식보다 값이 클 경우 실행
+        if (leftComparerResult > 0 && rightComparerResult > 0)
+        {
+          // 왼쪽, 오른쪽 자식 크기 비교 후 작은 쪽 선택
+          int childIndex = Comparer.Compare(Tree[leftIndex],
+          Tree[rightIndex]) < 0 ? leftIndex : rightIndex;
+          // 두 노드 위치 교환
+          Swap(currIndex, childIndex);
+          // 현재 노드 위치를 작은 쪽 자식 위치로 이동
+          currIndex = childIndex;
+        }
         // 현재 노드가 왼쪽보다 값이 클 경우 실행
-        if (leftComparerResult > 0)
+        else if (leftComparerResult > 0)
         {
           // 두 노드 위치 교환
           Swap(currIndex, leftIndex);
@@ -6346,8 +6365,19 @@ public class MaxHeap<T> : Heap<T>
         rightComparerResult = rightIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
             Tree[rightIndex]) : 1;
 
+        // 현재 노드가 두 자식보다 값이 작을 경우 실행
+        if (leftComparerResult < 0 && rightComparerResult < 0)
+        {
+          // 왼쪽, 오른쪽 자식 크기 비교 후 큰 쪽 선택
+          int childIndex = Comparer.Compare(Tree[leftIndex],
+          Tree[rightIndex]) > 0 ? leftIndex : rightIndex;
+          // 두 노드 위치 교환
+          Swap(currIndex, childIndex);
+          // 현재 노드 위치를 큰 쪽 자식 위치로 이동
+          currIndex = childIndex;
+        }
         // 현재 노드가 왼쪽보다 값이 작을 경우 실행
-        if (leftComparerResult < 0)
+        else if (leftComparerResult < 0)
         {
           // 두 노드 위치 교환
           Swap(currIndex, leftIndex);

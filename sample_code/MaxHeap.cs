@@ -114,8 +114,19 @@ public class MaxHeap<T> : Heap<T>
         rightComparerResult = rightIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
             Tree[rightIndex]) : 1;
 
+        // 현재 노드가 두 자식보다 값이 작을 경우 실행
+        if (leftComparerResult < 0 && rightComparerResult < 0)
+        {
+          // 왼쪽, 오른쪽 자식 크기 비교 후 큰 쪽 선택
+          int childIndex = Comparer.Compare(Tree[leftIndex],
+          Tree[rightIndex]) > 0 ? leftIndex : rightIndex;
+          // 두 노드 위치 교환
+          Swap(currIndex, childIndex);
+          // 현재 노드 위치를 큰 쪽 자식 위치로 이동
+          currIndex = childIndex;
+        }
         // 현재 노드가 왼쪽보다 값이 작을 경우 실행
-        if (leftComparerResult < 0)
+        else if (leftComparerResult < 0)
         {
           // 두 노드 위치 교환
           Swap(currIndex, leftIndex);
