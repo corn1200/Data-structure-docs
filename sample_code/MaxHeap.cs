@@ -108,10 +108,11 @@ public class MaxHeap<T> : Heap<T>
         // 왼쪽, 오른쪽 자식 위치와 왼쪽, 오른쪽 자식과 비교 결과
         int leftIndex = currIndex * 2;
         int rightIndex = currIndex * 2 + 1;
-        leftComparerResult = Comparer.Compare(Tree[currIndex],
-            Tree[leftIndex]);
-        rightComparerResult = Comparer.Compare(Tree[currIndex],
-            Tree[rightIndex]);
+        // 자식 위치가 유효할 경우에만 비교
+        leftComparerResult = leftIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
+            Tree[leftIndex]) : 1;
+        rightComparerResult = rightIndex <= maxIndex ? Comparer.Compare(Tree[currIndex],
+            Tree[rightIndex]) : 1;
 
         // 현재 노드가 왼쪽보다 값이 작을 경우 실행
         if (leftComparerResult < 0)
