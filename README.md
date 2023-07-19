@@ -3317,11 +3317,17 @@ public class Graph<T>
   {
     NodeList = new List<Node<T>>();
   }
+
+  public List<Node<T>> GetNodeList()
+  {
+    return NodeList;
+  }
   // ...
 }
 ```
 그래프 자료구조를 표현할 클래스를 작성한다.   
-노드 목록 필드를 가지고, 기본 생성자로 노드 목록을 초기화한다.
+노드 목록 필드를 가지고, 기본 생성자로 노드 목록을 초기화한다.  
+노드 목록을 반환하는 메서드를 작성한다.
 
 ```c#
 // ...
@@ -3410,6 +3416,12 @@ public class Graph<T>
   public Graph()
   {
     NodeList = new List<Node<T>>();
+  }
+
+  // 노드 목록 반환
+  public List<Node<T>> GetNodeList()
+  {
+    return NodeList;
   }
 
   // 노드 추가

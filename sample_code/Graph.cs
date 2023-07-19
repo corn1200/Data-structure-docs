@@ -30,6 +30,12 @@ public class Graph<T>
     NodeList = new List<Node<T>>();
   }
 
+  // 노드 목록 반환
+  public List<Node<T>> GetNodeList()
+  {
+    return NodeList;
+  }
+
   // 노드 추가
   public Node<T> AddNode(T data)
   {
