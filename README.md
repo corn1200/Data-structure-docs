@@ -6080,7 +6080,7 @@ public class MaxHeap<T> : Heap<T>
 ```
 최대 힙 클래스는 최소 힙 클래스에서 부모 노드와 자식 노드를 교환하는 조건을 변경하여 작성한다.
 
-[파일](/sample_code/AVLTree.cs)
+[파일](/sample_code/MinHeap.cs)
 <details>
 <summary>C# 예제 코드</summary>
 
